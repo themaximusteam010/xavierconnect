@@ -141,7 +141,10 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
               <Link href={`/store/${store.slug}`} className="flex items-center gap-1 font-medium hover:text-brand">{store.name}<VerifiedMark level={p.vendor.verificationLevel} withLabel /></Link>
               {(store.city || store.state) && <p className="mt-0.5 flex items-center gap-1 text-[12px] text-ink-muted"><MapPin className="size-3" />{[store.city, store.state].filter(Boolean).join(", ")}</p>}
             </div>
-            <Link href={`/store/${store.slug}`} className="text-[13px] font-medium text-brand hover:underline">Visit store</Link>
+            <span className="flex flex-col items-end gap-1">
+              <Link href={`/store/${store.slug}`} className="text-[13px] font-medium text-brand hover:underline">Visit store</Link>
+              <a href={`/messages/start?vendor=${p.vendorId}&product=${p.id}`} className="text-[13px] font-medium text-brand hover:underline" data-testid="message-seller">Message seller</a>
+            </span>
           </div>
         </div>
       </div>

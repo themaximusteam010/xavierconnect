@@ -60,10 +60,13 @@ export default async function StorePage({ params, searchParams }: { params: Prom
               </p>
             </div>
           </div>
+          <div className="flex gap-2">
+          <a href={`/messages/start?vendor=${store.vendorId}`} className="inline-flex h-8 items-center rounded-md border border-line-strong bg-white px-3 text-[13px] font-medium hover:bg-sunken">Message store</a>
           <form action={toggleFollowStore}>
             <input type="hidden" name="storeId" value={store.id} /><input type="hidden" name="back" value={`/store/${store.slug}`} />
             <Button type="submit" variant={following ? "secondary" : "primary"} size="sm">{following ? "Following" : "Follow store"}</Button>
           </form>
+          </div>
         </div>
         <nav className="flex gap-6 border-b border-line text-sm" aria-label="Store sections">
           {[["products", `Products (${total})`], ...(services.length ? [["services", `Services (${services.length})`]] : []), ["about", "About & policies"]].map(([k, label]) => (

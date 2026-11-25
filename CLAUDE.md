@@ -21,6 +21,8 @@ Multi-vendor marketplace for Xavier Enterprise. Next.js 15 (App Router, server a
 - **Secrets**: provider credentials and bank details are encrypted with `encryptJson` (`ENCRYPTION_KEY`); never return them to the browser.
 - **FX** uses bigint scaled rates (`src/server/domain/fx.ts`), rounding down. No floats.
 - Staff pages need MFA (`ADMIN_MFA_REQUIRED`, default on). Seeds create rows but never overwrite existing ones.
+- **Messaging**: every operation goes through `authorize()` in `services/messaging.ts`; only DELIVERED messages and APPROVED attachments reach recipients. Moderation runs server-side before delivery (`src/server/moderation/*`). Staff may read only flagged content or reported conversations (docs/MESSAGING_POLICY.md) — never add an "all conversations" view.
+- **Google sign-in**: linking rules live in `services/google-accounts.ts`; never link by email without the documented checks, never grant roles from Google.
 - No fabricated data: no fake reviews, ratings, sales counts or testimonials. Demo seed data is labelled "(Demo)".
 
 ## Conventions

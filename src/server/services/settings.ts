@@ -8,6 +8,11 @@ export const SETTING_DEFAULTS = {
   reservationMinutes: 30, // how long unpaid orders hold stock
   downloadMaxCount: 5,
   downloadExpiryDays: 30,
+  msgViolationWindowDays: 30, // confirmed messaging violations counted over this window
+  msgRestrictAfter: 3, // confirmed violations before a temporary messaging restriction
+  msgRestrictHours: 24,
+  msgReviewAfter: 5, // confirmed violations before the account is flagged for administrative review
+  msgBlockedRetentionDays: 90, // blocked message text and flagged files are purged after this
 } as const;
 
 export type SettingKey = keyof typeof SETTING_DEFAULTS;

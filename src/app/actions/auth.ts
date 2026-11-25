@@ -70,7 +70,8 @@ export async function loginAction(_: ActionState, fd: FormData): Promise<ActionS
   }
   const user = await db.user.findUnique({ where: { email } });
   // Same response for unknown email and wrong password; verify a dummy hash to equalise timing.
-  const ok = user ? await verifyPassword(user.passwordHash, password) : (await hashPassword(password), false);
+  // Google-only accounts (no password) get the same response as a wrong password.
+  const ok = user?.passwordHash ? await verifyPassword(user.passwordHash, password) : (await hashPassword(password), false);
   if (!user || !ok) return { ok: false, message: "That email and password combination is not correct.", values };
   if (user.status !== "ACTIVE") return { ok: false, message: "This account is suspended. Contact support for help.", values };
   await createSession(user.id);

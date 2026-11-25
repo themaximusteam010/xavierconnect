@@ -18,6 +18,11 @@ const META: Record<SettingKey, { label: string; hint: string; unit?: string }> =
   reservationMinutes: { label: "Stock reservation for unpaid orders", hint: "Unpaid orders release stock after this.", unit: "minutes" },
   downloadMaxCount: { label: "Download limit per purchase", hint: "Times a buyer can download a digital file.", unit: "downloads" },
   downloadExpiryDays: { label: "Download link lifetime", hint: "Days a purchased download stays available.", unit: "days" },
+  msgViolationWindowDays: { label: "Messaging: violation window", hint: "Confirmed contact-sharing or off-platform-payment violations are counted over this period.", unit: "days" },
+  msgRestrictAfter: { label: "Messaging: restrict after", hint: "Confirmed violations in the window before sending is paused. The first one is a warning.", unit: "violations" },
+  msgRestrictHours: { label: "Messaging: restriction length", hint: "How long an automatic restriction lasts.", unit: "hours" },
+  msgReviewAfter: { label: "Messaging: admin review after", hint: "Confirmed violations before the account is flagged for a moderator. Suspension is always a staff decision.", unit: "violations" },
+  msgBlockedRetentionDays: { label: "Messaging: blocked-content retention", hint: "Blocked message text and flagged attachments are purged after this.", unit: "days" },
 };
 
 export default async function Settings({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {

@@ -29,6 +29,7 @@ export const PERMISSIONS = {
   "delivery.perform": "Update assigned deliveries",
   "integrations.view": "View payment and shipping provider status and logs",
   "integrations.manage": "Configure providers, credentials and payout corridors",
+  "messages.moderate": "Review flagged messages, reported conversations and messaging restrictions",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -59,7 +60,7 @@ export const ROLES: Record<string, { name: string; staff: boolean; vendorScoped?
   SUPPORT_AGENT: {
     name: "Customer Support Agent",
     staff: true,
-    permissions: ["admin.access", "support.view", "support.respond", "order.view_all", "user.view", "vendor.view", "dispute.decide"],
+    permissions: ["admin.access", "support.view", "support.respond", "order.view_all", "user.view", "vendor.view", "dispute.decide", "messages.moderate"],
   },
   CONTENT_MANAGER: { name: "Content Manager", staff: true, permissions: ["admin.access", "cms.manage"] },
   CUSTOMER: { name: "Customer", staff: false, permissions: [] },
@@ -73,11 +74,11 @@ export type RoleKey = keyof typeof ROLES;
 
 /** What a vendor-scoped role may do inside a vendor workspace. */
 export const VENDOR_CAPABILITIES = {
-  VENDOR: ["catalog", "orders", "finance", "settings", "staff", "services"],
-  SERVICE_PROVIDER: ["catalog", "orders", "finance", "settings", "staff", "services"],
-  VENDOR_STAFF: ["catalog", "orders", "services"],
+  VENDOR: ["catalog", "orders", "finance", "settings", "staff", "services", "messages"],
+  SERVICE_PROVIDER: ["catalog", "orders", "finance", "settings", "staff", "services", "messages"],
+  VENDOR_STAFF: ["catalog", "orders", "services", "messages"],
 } as const;
-export type VendorCapability = "catalog" | "orders" | "finance" | "settings" | "staff" | "services";
+export type VendorCapability = "catalog" | "orders" | "finance" | "settings" | "staff" | "services" | "messages";
 
 export interface RoleGrant {
   role: string;

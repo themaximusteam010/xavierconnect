@@ -30,7 +30,7 @@ export default async function VendorOrder({ params, searchParams }: { params: Pr
 
   return (
     <>
-      <PageHeader eyebrow="Order" title={vo.number} description={<span className="flex items-center gap-2"><StatusBadge status={vo.status} /> Placed {vo.createdAt.toLocaleString("en-NG", { dateStyle: "long", timeStyle: "short" })}</span>} />
+      <PageHeader eyebrow="Order" title={vo.number} actions={vo.order.user ? <a href={`/vendor-messages/start?order=${vo.id}`} className="inline-flex h-9 items-center rounded-md border border-line-strong bg-white px-3 text-sm font-medium hover:bg-sunken">Message buyer</a> : undefined} description={<span className="flex items-center gap-2"><StatusBadge status={vo.status} /> Placed {vo.createdAt.toLocaleString("en-NG", { dateStyle: "long", timeStyle: "short" })}</span>} />
       <FlashFromQuery ok={sp.ok} error={sp.error} />
       {vo.disputes.map((d) => (
         <section key={d.id} className={`mb-6 rounded-lg border p-4 text-sm ${["OPEN", "AWAITING_VENDOR", "UNDER_REVIEW"].includes(d.status) ? "border-amber-300 bg-warning-soft" : "border-line bg-white"}`}>

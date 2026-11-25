@@ -36,7 +36,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
           {order.paymentStatus === "PAID" && <ButtonLink href={`/account/support?order=${order.number}`} variant="secondary">Get help with this order</ButtonLink>}
         </div>
       </div>
-      <OrderDetail order={order} renderActions={(vo) => <BuyerProtection vo={vo} />} />
+      <OrderDetail order={order} renderActions={(vo) => <BuyerProtection vo={vo} />} renderHeaderAction={(vo) => order.paymentStatus !== "UNPAID" ? <a href={`/messages/start?vendor=${vo.vendorId}&order=${order.number}`} className="text-[13px] font-medium text-brand hover:underline">Message seller</a> : null} />
     </>
   );
 }

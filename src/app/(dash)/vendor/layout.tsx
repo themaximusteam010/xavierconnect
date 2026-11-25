@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/server/db";
 import { requireUser } from "@/server/auth/session";
 import { hasVendorCapability } from "@/server/auth/rbac";
+import { unreadCounts } from "@/server/services/messaging";
 import { DashShell } from "@/components/layout/dash-shell";
 
 export const dynamic = "force-dynamic";
@@ -11,16 +12,18 @@ export default async function VendorLayout({ children }: { children: React.React
   const vendorId = u.vendorIds[0];
   if (!vendorId) redirect("/sell/apply");
   const vendor = await db.vendor.findUniqueOrThrow({ where: { id: vendorId }, include: { store: true } });
-  const [newOrders, pendingBookings, failedPayouts] = await Promise.all([
+  const [newOrders, pendingBookings, failedPayouts, unreadMsgs] = await Promise.all([
     db.vendorOrder.count({ where: { vendorId, status: "NEW" } }),
     db.booking.count({ where: { vendorId, status: "REQUESTED" } }),
     db.payout.count({ where: { vendorId, status: "FAILED", updatedAt: { gte: new Date(Date.now() - 7 * 864e5) } } }),
+    unreadCounts(u).then((c) => c.vendor),
   ]);
   const can = (c: Parameters<typeof hasVendorCapability>[2]) => hasVendorCapability(u.grants, vendorId, c);
   const nav = [
     { href: "/vendor", label: "Overview" },
     can("catalog") && { href: "/vendor/products", label: "Products" },
     can("orders") && { href: "/vendor/orders", label: "Orders", badge: newOrders },
+    can("messages") && { href: "/vendor/messages", label: "Messages", badge: unreadMsgs },
     can("services") && { href: "/vendor/services", label: "Services" },
     can("services") && { href: "/vendor/bookings", label: "Bookings", badge: pendingBookings },
     can("orders") && { href: "/vendor/shipments", label: "Shipments" },

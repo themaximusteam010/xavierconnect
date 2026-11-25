@@ -10,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   // Migrations need a session connection; runtime traffic can use the transaction pooler.
   directUrl = env("DIRECT_URL")
@@ -24,47 +24,55 @@ enum UserStatus {
 }
 
 model User {
-  id              String     @id @default(cuid())
-  email           String     @unique
-  phone           String?
-  name            String
-  passwordHash    String
-  status          UserStatus @default(ACTIVE)
-  emailVerifiedAt DateTime?
-  mfaSecret       String?
-  mfaEnabledAt    DateTime?
+  id               String     @id @default(cuid())
+  email            String     @unique
+  phone            String?
+  name             String
+  passwordHash     String? // null for accounts created with Google sign-in only
+  status           UserStatus @default(ACTIVE)
+  lastSeenAt       DateTime? // messaging presence, updated at most every 30 s
+  emailVerifiedAt  DateTime?
+  mfaSecret        String?
+  mfaEnabledAt     DateTime?
   mfaRecoveryCodes String[] // sha256 hashes of one-time recovery codes
-  lastLoginAt     DateTime?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  deletedAt       DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
 
-  roles              UserRole[]
-  sessions           Session[]
-  tokens             VerificationToken[]
-  vendorsOwned       Vendor[]             @relation("VendorOwner")
-  addresses          Address[]
-  cart               Cart?
-  orders             Order[]
-  wishlist           WishlistItem[]
-  follows            StoreFollow[]
-  reviews            Review[]
-  notifications      Notification[]
-  notificationPrefs  NotificationPreference[]
-  bookings           Booking[]
-  conversations      Conversation[]       @relation("ConversationCustomer")
-  messagesSent       Message[]
-  tickets            SupportTicket[]      @relation("TicketOwner")
-  ticketsAssigned    SupportTicket[]      @relation("TicketAssignee")
-  ticketMessages     TicketMessage[]
-  disputesOpened     Dispute[]            @relation("DisputeOpener")
-  auditLogs          AuditLog[]
-  downloadGrants     DownloadGrant[]
-  shipmentsAssigned  Shipment[]
-  reports            Report[]
-  blogPosts          BlogPost[]
-  reviewVotes        ReviewVote[]
-  payoutsReviewed    Payout[]             @relation("PayoutReviewer")
+  roles                      UserRole[]
+  sessions                   Session[]
+  tokens                     VerificationToken[]
+  vendorsOwned               Vendor[]                   @relation("VendorOwner")
+  addresses                  Address[]
+  cart                       Cart?
+  orders                     Order[]
+  wishlist                   WishlistItem[]
+  follows                    StoreFollow[]
+  reviews                    Review[]
+  notifications              Notification[]
+  notificationPrefs          NotificationPreference[]
+  bookings                   Booking[]
+  conversations              Conversation[]             @relation("ConversationCustomer")
+  conversationParticipations ConversationParticipant[]
+  messageReadReceipts        MessageReadReceipt[]
+  messageReports             MessageReport[]            @relation("MessageReporter")
+  moderationEvents           ModerationEvent[]          @relation("ModerationSubject")
+  messagingRestrictions      UserMessagingRestriction[] @relation("RestrictedUser")
+  externalIdentities         ExternalIdentityAccount[]
+  oauthLinkEvents            OAuthAccountLink[]
+  messagesSent               Message[]
+  tickets                    SupportTicket[]            @relation("TicketOwner")
+  ticketsAssigned            SupportTicket[]            @relation("TicketAssignee")
+  ticketMessages             TicketMessage[]
+  disputesOpened             Dispute[]                  @relation("DisputeOpener")
+  auditLogs                  AuditLog[]
+  downloadGrants             DownloadGrant[]
+  shipmentsAssigned          Shipment[]
+  reports                    Report[]
+  blogPosts                  BlogPost[]
+  reviewVotes                ReviewVote[]
+  payoutsReviewed            Payout[]                   @relation("PayoutReviewer")
 }
 
 model Role {
@@ -109,16 +117,16 @@ model UserRole {
 }
 
 model Session {
-  id         String   @id @default(cuid())
-  tokenHash  String   @unique
-  userId     String
-  expiresAt  DateTime
-  ipAddress  String?
-  userAgent  String?
-  createdAt  DateTime @default(now())
-  lastSeenAt DateTime @default(now())
+  id            String    @id @default(cuid())
+  tokenHash     String    @unique
+  userId        String
+  expiresAt     DateTime
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime  @default(now())
+  lastSeenAt    DateTime  @default(now())
   mfaVerifiedAt DateTime?
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -186,37 +194,37 @@ enum VerificationLevel {
 }
 
 model Vendor {
-  id                  String            @id @default(cuid())
-  ownerId             String
-  type                VendorType
-  status              VendorStatus      @default(DRAFT)
-  verificationLevel   VerificationLevel @default(BASIC)
-  businessName        String
-  description         String?
-  businessCategory    String?
-  email               String
-  phone               String
-  website             String?
-  socialLinks         Json?
-  addressLine1        String?
-  city                String?
-  state               String?
-  country             String            @default("NG")
-  rcNumber            String? // CAC registration number for registered businesses
-  region              String? // state/province for non-NG vendors
-  payoutCurrency      String            @default("NGN")
-  handlingDays        Int               @default(1)
-  internationalShipping Boolean         @default(false)
-  onboardingStep      Int               @default(1)
-  agreementAcceptedAt DateTime?
-  agreementVersion    String?
-  submittedAt         DateTime?
-  reviewedAt          DateTime?
-  reviewNote          String?
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  id                    String            @id @default(cuid())
+  ownerId               String
+  type                  VendorType
+  status                VendorStatus      @default(DRAFT)
+  verificationLevel     VerificationLevel @default(BASIC)
+  businessName          String
+  description           String?
+  businessCategory      String?
+  email                 String
+  phone                 String
+  website               String?
+  socialLinks           Json?
+  addressLine1          String?
+  city                  String?
+  state                 String?
+  country               String            @default("NG")
+  rcNumber              String? // CAC registration number for registered businesses
+  region                String? // state/province for non-NG vendors
+  payoutCurrency        String            @default("NGN")
+  handlingDays          Int               @default(1)
+  internationalShipping Boolean           @default(false)
+  onboardingStep        Int               @default(1)
+  agreementAcceptedAt   DateTime?
+  agreementVersion      String?
+  submittedAt           DateTime?
+  reviewedAt            DateTime?
+  reviewNote            String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
 
-  owner           User               @relation("VendorOwner", fields: [ownerId], references: [id])
+  owner           User                @relation("VendorOwner", fields: [ownerId], references: [id])
   store           Store?
   members         UserRole[]
   documents       VendorDocument[]
@@ -305,21 +313,21 @@ enum CategoryKind {
 }
 
 model Category {
-  id                String           @id @default(cuid())
-  parentId          String?
-  kind              CategoryKind
-  slug              String           @unique
-  name              String
-  description       String?
-  imageUrl          String?
-  sortOrder         Int              @default(0)
-  isFeatured        Boolean          @default(false)
-  createdAt         DateTime         @default(now())
-  parent            Category?        @relation("CategoryTree", fields: [parentId], references: [id])
-  children          Category[]       @relation("CategoryTree")
-  products          Product[]
-  services          Service[]
-  commissionRules   CommissionRule[]
+  id              String           @id @default(cuid())
+  parentId        String?
+  kind            CategoryKind
+  slug            String           @unique
+  name            String
+  description     String?
+  imageUrl        String?
+  sortOrder       Int              @default(0)
+  isFeatured      Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  parent          Category?        @relation("CategoryTree", fields: [parentId], references: [id])
+  children        Category[]       @relation("CategoryTree")
+  products        Product[]
+  services        Service[]
+  commissionRules CommissionRule[]
 
   @@index([kind, parentId])
 }
@@ -380,17 +388,17 @@ model Product {
   updatedAt         DateTime      @updatedAt
   deletedAt         DateTime?
 
-  vendor        Vendor                 @relation(fields: [vendorId], references: [id])
-  category      Category               @relation(fields: [categoryId], references: [id])
-  images        ProductImage[]
-  variants      ProductVariant[]
-  digitalAssets DigitalAsset[]
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
-  reviews       Review[]
-  wishlist      WishlistItem[]
-  reservations  InventoryReservation[]
-  questions     ProductQuestion[]
+  vendor          Vendor                 @relation(fields: [vendorId], references: [id])
+  category        Category               @relation(fields: [categoryId], references: [id])
+  images          ProductImage[]
+  variants        ProductVariant[]
+  digitalAssets   DigitalAsset[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  wishlist        WishlistItem[]
+  reservations    InventoryReservation[]
+  questions       ProductQuestion[]
   commissionRules CommissionRule[]
 
   @@index([status, categoryId])
@@ -579,28 +587,28 @@ enum BookingStatus {
 }
 
 model Booking {
-  id          String        @id @default(cuid())
-  number      String        @unique
-  serviceId   String
-  packageId   String
-  vendorId    String
-  customerId  String
-  orderItemId String?       @unique
-  startAt     DateTime
-  endAt       DateTime
-  status      BookingStatus @default(PENDING_PAYMENT)
-  notes       String?
-  address     String?
-  completedAt DateTime?
-  cancelledAt DateTime?
+  id           String         @id @default(cuid())
+  number       String         @unique
+  serviceId    String
+  packageId    String
+  vendorId     String
+  customerId   String
+  orderItemId  String?        @unique
+  startAt      DateTime
+  endAt        DateTime
+  status       BookingStatus  @default(PENDING_PAYMENT)
+  notes        String?
+  address      String?
+  completedAt  DateTime?
+  cancelledAt  DateTime?
   cancelReason String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  service     Service       @relation(fields: [serviceId], references: [id])
-  package     ServicePackage @relation(fields: [packageId], references: [id])
-  vendor      Vendor        @relation(fields: [vendorId], references: [id])
-  customer    User          @relation(fields: [customerId], references: [id])
-  orderItem   OrderItem?    @relation(fields: [orderItemId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  service      Service        @relation(fields: [serviceId], references: [id])
+  package      ServicePackage @relation(fields: [packageId], references: [id])
+  vendor       Vendor         @relation(fields: [vendorId], references: [id])
+  customer     User           @relation(fields: [customerId], references: [id])
+  orderItem    OrderItem?     @relation(fields: [orderItemId], references: [id])
 
   @@index([serviceId, startAt])
   @@index([vendorId, status])
@@ -621,14 +629,14 @@ model Cart {
 }
 
 model CartItem {
-  id         String          @id @default(cuid())
+  id         String   @id @default(cuid())
   cartId     String
   productId  String
-  variantKey String          @default("") // variant id or "" — avoids NULL-distinct unique issue
+  variantKey String   @default("") // variant id or "" — avoids NULL-distinct unique issue
   quantity   Int
-  createdAt  DateTime        @default(now())
-  cart       Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product    Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([cartId, productId, variantKey])
 }
@@ -700,29 +708,29 @@ enum VendorOrderStatus {
 
 /// One vendor's slice of a customer order. Vendors only ever see their own.
 model VendorOrder {
-  id               String            @id @default(cuid())
-  number           String            @unique // XC-10001-A
-  orderId          String
-  vendorId         String
-  status           VendorOrderStatus @default(AWAITING_PAYMENT)
-  subtotalMinor    BigInt
-  discountMinor    BigInt            @default(0)
-  shippingMinor    BigInt            @default(0)
-  taxMinor         BigInt            @default(0)
-  totalMinor       BigInt
-  commissionMinor  BigInt            @default(0)
-  vendorNetMinor   BigInt            @default(0)
-  shippingMethodId String?
-  deliveredAt      DateTime?
-  deliveryEvidence String? // CARRIER | RIDER_POD | CUSTOMER_CONFIRMED | DIGITAL | SERVICE_COMPLETED | VENDOR_CLAIM | ADMIN
-  settlementCurrency String         @default("NGN")
-  processingFeeMinor BigInt         @default(0)
-  settledAt        DateTime? // when earnings moved pending -> available
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id                 String            @id @default(cuid())
+  number             String            @unique // XC-10001-A
+  orderId            String
+  vendorId           String
+  status             VendorOrderStatus @default(AWAITING_PAYMENT)
+  subtotalMinor      BigInt
+  discountMinor      BigInt            @default(0)
+  shippingMinor      BigInt            @default(0)
+  taxMinor           BigInt            @default(0)
+  totalMinor         BigInt
+  commissionMinor    BigInt            @default(0)
+  vendorNetMinor     BigInt            @default(0)
+  shippingMethodId   String?
+  deliveredAt        DateTime?
+  deliveryEvidence   String? // CARRIER | RIDER_POD | CUSTOMER_CONFIRMED | DIGITAL | SERVICE_COMPLETED | VENDOR_CLAIM | ADMIN
+  settlementCurrency String            @default("NGN")
+  processingFeeMinor BigInt            @default(0)
+  settledAt          DateTime? // when earnings moved pending -> available
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
-  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  vendor    Vendor      @relation(fields: [vendorId], references: [id])
+  order     Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  vendor    Vendor             @relation(fields: [vendorId], references: [id])
   items     OrderItem[]
   shipments Shipment[]
   refunds   Refund[]
@@ -811,19 +819,19 @@ model Payment {
 
 /// Every webhook we receive. Unique (provider, eventKey) makes processing idempotent.
 model PaymentEvent {
-  id          String    @id @default(cuid())
-  provider    String
-  eventKey    String
-  type        String
-  payload     Json
-  signatureOk Boolean
-  kind        String    @default("PAYMENT") // PAYMENT | PAYOUT | SHIPPING
-  attempts    Int       @default(0)
-  nextRetryAt DateTime?
+  id             String    @id @default(cuid())
+  provider       String
+  eventKey       String
+  type           String
+  payload        Json
+  signatureOk    Boolean
+  kind           String    @default("PAYMENT") // PAYMENT | PAYOUT | SHIPPING
+  attempts       Int       @default(0)
+  nextRetryAt    DateTime?
   deadLetteredAt DateTime?
-  processedAt DateTime?
-  error       String?
-  createdAt   DateTime  @default(now())
+  processedAt    DateTime?
+  error          String?
+  createdAt      DateTime  @default(now())
 
   @@unique([provider, eventKey])
 }
@@ -957,32 +965,32 @@ enum PayoutStatus {
 }
 
 model Payout {
-  id             String       @id @default(cuid())
-  vendorId       String
-  amountMinor    BigInt
-  status         PayoutStatus @default(REQUESTED)
-  idempotencyKey String       @unique
-  currency       String       @default("NGN") // ledger currency the amount is held in
-  beneficiaryId  String?
-  providerKey    String? // "manual" = finance pays by bank transfer and records the reference
-  method         String       @default("LOCAL") // LOCAL | CROSS_BORDER
+  id                    String        @id @default(cuid())
+  vendorId              String
+  amountMinor           BigInt
+  status                PayoutStatus  @default(REQUESTED)
+  idempotencyKey        String        @unique
+  currency              String        @default("NGN") // ledger currency the amount is held in
+  beneficiaryId         String?
+  providerKey           String? // "manual" = finance pays by bank transfer and records the reference
+  method                String        @default("LOCAL") // LOCAL | CROSS_BORDER
   settlementCurrency    String?
   settlementAmountMinor BigInt?
-  fxRate         Decimal?     @db.Decimal(24, 12)
-  providerFeeMinor BigInt     @default(0)
-  initiatedAt    DateTime?
-  providerRef    String?
-  failureReason  String?
-  reviewedById   String?
-  reviewedAt     DateTime?
-  paidAt         DateTime?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  vendor         Vendor       @relation(fields: [vendorId], references: [id])
-  reviewedBy     User?        @relation("PayoutReviewer", fields: [reviewedById], references: [id])
-  beneficiary    Beneficiary? @relation(fields: [beneficiaryId], references: [id])
-  events         PayoutEvent[]
-  fxQuote        FxQuote?
+  fxRate                Decimal?      @db.Decimal(24, 12)
+  providerFeeMinor      BigInt        @default(0)
+  initiatedAt           DateTime?
+  providerRef           String?
+  failureReason         String?
+  reviewedById          String?
+  reviewedAt            DateTime?
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  vendor                Vendor        @relation(fields: [vendorId], references: [id])
+  reviewedBy            User?         @relation("PayoutReviewer", fields: [reviewedById], references: [id])
+  beneficiary           Beneficiary?  @relation(fields: [beneficiaryId], references: [id])
+  events                PayoutEvent[]
+  fxQuote               FxQuote?
 
   @@index([vendorId, status])
 }
@@ -996,19 +1004,19 @@ enum ShippingRateType {
 }
 
 model ShippingMethod {
-  id            String           @id @default(cuid())
-  vendorId      String
-  name          String
-  type          ShippingRateType
-  rateMinor     BigInt           @default(0)
-  perKgMinor    BigInt           @default(0)
-  freeOverMinor BigInt? // free shipping when vendor subtotal >= this
-  states        String[] // empty = nationwide
+  id                   String           @id @default(cuid())
+  vendorId             String
+  name                 String
+  type                 ShippingRateType
+  rateMinor            BigInt           @default(0)
+  perKgMinor           BigInt           @default(0)
+  freeOverMinor        BigInt? // free shipping when vendor subtotal >= this
+  states               String[] // empty = nationwide
   destinationCountries String[] // empty = vendor's own country only
-  etaDaysMin    Int              @default(1)
-  etaDaysMax    Int              @default(5)
-  active        Boolean          @default(true)
-  vendor        Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  etaDaysMin           Int              @default(1)
+  etaDaysMax           Int              @default(5)
+  active               Boolean          @default(true)
+  vendor               Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   @@index([vendorId])
 }
@@ -1024,48 +1032,48 @@ enum ShipmentStatus {
 }
 
 model Shipment {
-  id                String          @id @default(cuid())
-  vendorOrderId     String
-  carrier           String          @default("Vendor delivery")
-  trackingNumber    String?
-  status            ShipmentStatus  @default(PENDING)
-  deliveryPartnerId String?
+  id                 String              @id @default(cuid())
+  vendorOrderId      String
+  carrier            String              @default("Vendor delivery")
+  trackingNumber     String?
+  status             ShipmentStatus      @default(PENDING)
+  deliveryPartnerId  String?
   proofOfDeliveryKey String?
-  recipientName     String?
-  providerKey       String?
+  recipientName      String?
+  providerKey        String?
   providerShipmentId String?
-  service           String?
-  costMinor         BigInt?
-  costCurrency      String?
-  labelUrl          String?
-  trackingUrl       String?
-  international     Boolean         @default(false)
-  originCountry     String?
+  service            String?
+  costMinor          BigInt?
+  costCurrency       String?
+  labelUrl           String?
+  trackingUrl        String?
+  international      Boolean             @default(false)
+  originCountry      String?
   destinationCountry String?
-  weightGrams       Int?
-  lastEventAt       DateTime?
-  failureReason     String?
-  shippedAt         DateTime?
-  deliveredAt       DateTime?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  vendorOrder       VendorOrder     @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
-  deliveryPartner   User?           @relation(fields: [deliveryPartnerId], references: [id])
-  events            ShipmentEvent[]
-  customs           CustomsDeclaration?
+  weightGrams        Int?
+  lastEventAt        DateTime?
+  failureReason      String?
+  shippedAt          DateTime?
+  deliveredAt        DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  vendorOrder        VendorOrder         @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
+  deliveryPartner    User?               @relation(fields: [deliveryPartnerId], references: [id])
+  events             ShipmentEvent[]
+  customs            CustomsDeclaration?
 
   @@index([deliveryPartnerId, status])
 }
 
 model ShipmentEvent {
-  id         String         @id @default(cuid())
-  providerEventId String?   @unique
-  shipmentId String
-  status     ShipmentStatus
-  location   String?
-  note       String?
-  createdAt  DateTime       @default(now())
-  shipment   Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  id              String         @id @default(cuid())
+  providerEventId String?        @unique
+  shipmentId      String
+  status          ShipmentStatus
+  location        String?
+  note            String?
+  createdAt       DateTime       @default(now())
+  shipment        Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 }
 
 // ───────────────────────────── Engagement ─────────────────────────────
@@ -1123,34 +1131,255 @@ model WishlistItem {
 }
 
 model Conversation {
-  id         String    @id @default(cuid())
-  customerId String
-  vendorId   String
-  subject    String
-  orderId    String?
-  bookingId  String?
-  lastMessageAt DateTime @default(now())
-  createdAt  DateTime  @default(now())
-  customer   User      @relation("ConversationCustomer", fields: [customerId], references: [id])
-  vendor     Vendor    @relation(fields: [vendorId], references: [id])
-  messages   Message[]
+  id                  String                    @id @default(cuid())
+  customerId          String
+  vendorId            String
+  subject             String
+  orderId             String?
+  bookingId           String?
+  productId           String? // context the conversation was started from
+  serviceId           String?
+  blockedByCustomerAt DateTime? // customer blocked this store
+  blockedByVendorAt   DateTime? // store blocked this customer
+  lastMessageAt       DateTime                  @default(now())
+  createdAt           DateTime                  @default(now())
+  customer            User                      @relation("ConversationCustomer", fields: [customerId], references: [id])
+  vendor              Vendor                    @relation(fields: [vendorId], references: [id])
+  messages            Message[]
+  participants        ConversationParticipant[]
+  reports             MessageReport[]
+  notifications       MessageNotification[]
 
   @@index([customerId])
   @@index([vendorId])
+  @@index([customerId, lastMessageAt])
+  @@index([vendorId, lastMessageAt])
+}
+
+/**
+ * Per-user state in a conversation (read position, archive, typing). Side decides who may act.
+ */
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  side           String // CUSTOMER | VENDOR
+  lastReadAt     DateTime?
+  archivedAt     DateTime?
+  typingUntil    DateTime?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([userId])
 }
 
 model Message {
-  id             String       @id @default(cuid())
-  conversationId String
-  senderId       String
-  body           String
-  attachmentUrl  String?
-  readAt         DateTime?
-  createdAt      DateTime     @default(now())
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User         @relation(fields: [senderId], references: [id])
+  id               String               @id @default(cuid())
+  conversationId   String
+  senderId         String
+  body             String
+  attachmentUrl    String? // legacy, unused
+  readAt           DateTime? // legacy, unused (see MessageReadReceipt)
+  senderSide       String               @default("CUSTOMER") // CUSTOMER | VENDOR
+  status           MessageStatus        @default(DELIVERED)
+  moderation       ModerationDecision   @default(APPROVED)
+  productId        String? // product reference shown as a card
+  orderId          String? // order reference shown as a card
+  deliveredAt      DateTime? // set only when the recipient may see it
+  createdAt        DateTime             @default(now())
+  conversation     Conversation         @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender           User                 @relation(fields: [senderId], references: [id])
+  attachments      MessageAttachment[]
+  receipts         MessageReadReceipt[]
+  reports          MessageReport[]
+  moderationEvents ModerationEvent[]
 
   @@index([conversationId, createdAt])
+  @@index([conversationId, deliveredAt])
+  @@index([status, createdAt])
+}
+
+enum MessageStatus {
+  DELIVERED // visible to both sides
+  HELD // REVIEW: waiting for a moderator, visible only to the sender
+  BLOCKED // never delivered
+}
+
+enum ModerationDecision {
+  APPROVED
+  BLOCKED
+  REVIEW
+  ATTACHMENT_BLOCKED
+}
+
+enum AttachmentStatus {
+  PENDING // being inspected
+  APPROVED
+  REVIEW // held for a moderator
+  BLOCKED
+}
+
+/**
+ * Private file. Served only through /messages/attachment/[id] after authorisation and approval.
+ */
+model MessageAttachment {
+  id           String           @id @default(cuid())
+  messageId    String
+  uploaderId   String
+  storageKey   String? // null once purged under the retention policy
+  fileName     String
+  mimeType     String
+  size         Int
+  sha256       String
+  status       AttachmentStatus @default(PENDING)
+  findings     Json? // detector categories (no raw matches)
+  scanner      String? // e.g. "ocr+qr", "clamav", "none"
+  scannedAt    DateTime?
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime         @default(now())
+  message      Message          @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([status, createdAt])
+}
+
+model MessageReadReceipt {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId])
+}
+
+model MessageReport {
+  id             String       @id @default(cuid())
+  conversationId String
+  messageId      String?
+  reporterId     String
+  reason         String
+  details        String?
+  status         String       @default("OPEN") // OPEN | RESOLVED | DISMISSED
+  resolvedById   String?
+  resolution     String?
+  resolvedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message        Message?     @relation(fields: [messageId], references: [id])
+  reporter       User         @relation("MessageReporter", fields: [reporterId], references: [id])
+
+  @@index([status, createdAt])
+}
+
+/**
+ * Every automatic or moderator decision. `confirmed` events count towards progressive enforcement.
+ */
+model ModerationEvent {
+  id             String             @id @default(cuid())
+  userId         String // the sender the decision is about
+  conversationId String?
+  messageId      String?
+  attachmentId   String?
+  decision       ModerationDecision
+  categories     String[]
+  detail         Json? // redacted findings, never full contact details
+  source         String             @default("AUTO") // AUTO | MODERATOR
+  confirmed      Boolean            @default(false)
+  actorId        String?
+  note           String?
+  createdAt      DateTime           @default(now())
+  user           User               @relation("ModerationSubject", fields: [userId], references: [id])
+  message        Message?           @relation(fields: [messageId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([decision, createdAt])
+}
+
+/**
+ * Admin-configurable rules: extra blocked/review terms, allowed domains, detector switches.
+ */
+model ModerationRule {
+  id          String   @id @default(cuid())
+  kind        String // BLOCK_TERM | REVIEW_TERM | ALLOW_DOMAIN | DETECTOR
+  value       String
+  enabled     Boolean  @default(true)
+  note        String?
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([kind, value])
+}
+
+model UserMessagingRestriction {
+  id          String    @id @default(cuid())
+  userId      String
+  kind        String // WARNING | MUTE | REVIEW_FLAG
+  reason      String
+  startsAt    DateTime  @default(now())
+  endsAt      DateTime? // null = until lifted (MUTE set by a moderator)
+  createdById String? // null = automatic
+  liftedAt    DateTime?
+  liftedById  String?
+  createdAt   DateTime  @default(now())
+  user        User      @relation("RestrictedUser", fields: [userId], references: [id])
+
+  @@index([userId, kind, endsAt])
+}
+
+/**
+ * Throttles new-message notifications to one per conversation until the recipient reads it.
+ */
+model MessageNotification {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  lastMessageId  String
+  notifiedAt     DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+/**
+ * A verified external identity (Google `sub`) linked to a user. One identity → one user.
+ */
+model ExternalIdentityAccount {
+  id            String    @id @default(cuid())
+  userId        String
+  provider      String // "google"
+  subject       String // OIDC `sub` — stable, never the email
+  email         String?
+  emailVerified Boolean   @default(false)
+  name          String?
+  linkedAt      DateTime  @default(now())
+  lastLoginAt   DateTime?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, subject])
+  @@index([userId])
+}
+
+/**
+ * History of link/unlink and refused sign-ins (audit).
+ */
+model OAuthAccountLink {
+  id        String   @id @default(cuid())
+  userId    String?
+  provider  String
+  subject   String
+  action    String // LINKED | UNLINKED | SIGNED_UP | REFUSED
+  reason    String?
+  ip        String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([provider, subject])
 }
 
 model Notification {
@@ -1206,20 +1435,20 @@ enum CouponType {
 }
 
 model Coupon {
-  id            String     @id @default(cuid())
-  code          String     @unique
-  vendorId      String? // null = platform-funded coupon
-  type          CouponType
-  value         Int // bps for PERCENT (1000 = 10%), minor units for FIXED
-  minSubtotalMinor BigInt  @default(0)
+  id               String     @id @default(cuid())
+  code             String     @unique
+  vendorId         String? // null = platform-funded coupon
+  type             CouponType
+  value            Int // bps for PERCENT (1000 = 10%), minor units for FIXED
+  minSubtotalMinor BigInt     @default(0)
   maxDiscountMinor BigInt?
-  maxUses       Int?
-  usedCount     Int        @default(0)
-  startsAt      DateTime?
-  endsAt        DateTime?
-  active        Boolean    @default(true)
-  createdAt     DateTime   @default(now())
-  vendor        Vendor?    @relation(fields: [vendorId], references: [id])
+  maxUses          Int?
+  usedCount        Int        @default(0)
+  startsAt         DateTime?
+  endsAt           DateTime?
+  active           Boolean    @default(true)
+  createdAt        DateTime   @default(now())
+  vendor           Vendor?    @relation(fields: [vendorId], references: [id])
 }
 
 model SubscriptionPlan {
@@ -1237,16 +1466,16 @@ model SubscriptionPlan {
 }
 
 model VendorSubscription {
-  id               String           @id @default(cuid())
-  vendorId         String           @unique
-  planId           String
-  status           String           @default("ACTIVE") // ACTIVE, PAST_DUE, CANCELLED, EXPIRED
-  currentPeriodEnd DateTime
-  cancelAtPeriodEnd Boolean         @default(false)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  vendor           Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
-  plan             SubscriptionPlan @relation(fields: [planId], references: [id])
+  id                String           @id @default(cuid())
+  vendorId          String           @unique
+  planId            String
+  status            String           @default("ACTIVE") // ACTIVE, PAST_DUE, CANCELLED, EXPIRED
+  currentPeriodEnd  DateTime
+  cancelAtPeriodEnd Boolean          @default(false)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  vendor            Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  plan              SubscriptionPlan @relation(fields: [planId], references: [id])
 }
 
 model NewsletterSubscriber {
@@ -1460,7 +1689,6 @@ model StoredFile {
   createdAt DateTime @default(now())
 }
 
-
 // ───────────────────────────── Integrations, payouts, FX, shipping (Nov 2026) ─────────────────────────────
 
 enum ProviderMode {
@@ -1600,17 +1828,17 @@ model IntegrationLog {
 }
 
 model AdminAlert {
-  id          String    @id @default(cuid())
-  dedupeKey   String    @unique
-  type        String
-  severity    String // INFO | WARNING | CRITICAL
-  title       String
-  detail      String?
-  link        String?
-  count       Int       @default(1)
-  firstSeenAt DateTime  @default(now())
-  lastSeenAt  DateTime  @default(now())
-  resolvedAt  DateTime?
+  id           String    @id @default(cuid())
+  dedupeKey    String    @unique
+  type         String
+  severity     String // INFO | WARNING | CRITICAL
+  title        String
+  detail       String?
+  link         String?
+  count        Int       @default(1)
+  firstSeenAt  DateTime  @default(now())
+  lastSeenAt   DateTime  @default(now())
+  resolvedAt   DateTime?
   resolvedById String?
 
   @@index([resolvedAt, severity])

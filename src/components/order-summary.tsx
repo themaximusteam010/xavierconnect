@@ -26,7 +26,7 @@ export function PaymentBanner({ outcome }: { outcome?: string }) {
   return null;
 }
 
-export function OrderDetail({ order, downloads = true, renderActions }: { order: OrderFull; downloads?: boolean; renderActions?: (vo: OrderFull["vendorOrders"][number]) => React.ReactNode }) {
+export function OrderDetail({ order, downloads = true, renderActions, renderHeaderAction }: { order: OrderFull; downloads?: boolean; renderActions?: (vo: OrderFull["vendorOrders"][number]) => React.ReactNode; renderHeaderAction?: (vo: OrderFull["vendorOrders"][number]) => React.ReactNode }) {
   const addr = order.shippingAddress as { fullName: string; phone: string; line1: string; line2?: string; city: string; state: string } | null;
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
@@ -35,7 +35,7 @@ export function OrderDetail({ order, downloads = true, renderActions }: { order:
           <section key={vo.id} className="rounded-lg border border-line">
             <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-canvas px-4 py-3 text-sm">
               <div><span className="font-medium">{vo.vendor.store?.name}</span><span className="ml-2 text-ink-muted">Shipment {vo.number}</span></div>
-              <StatusBadge status={vo.status} />
+              <span className="flex items-center gap-3">{renderHeaderAction?.(vo)}<StatusBadge status={vo.status} /></span>
             </header>
             <ul className="divide-y divide-line">
               {vo.items.map((it) => (

@@ -45,6 +45,17 @@ async function put(visibility: "public" | "private", folder: string, ext: string
   return key;
 }
 
+/** Raw private bytes (already validated by the caller, e.g. message attachments after moderation). */
+export async function savePrivateBytes(folder: string, ext: string, buf: Buffer) {
+  return put("private", folder, ext, buf);
+}
+
+export async function deleteStored(key: string) {
+  if (DRIVER === "db") { await db.storedFile.deleteMany({ where: { key } }); return; }
+  const { unlink } = await import("node:fs/promises");
+  await unlink(safeKey(key)).catch(() => undefined);
+}
+
 /** Product/store image. Validates declared type AND file signature; 5 MB limit. */
 export async function saveImage(file: File, folder: string) {
   const t = IMAGE_TYPES[file.type];

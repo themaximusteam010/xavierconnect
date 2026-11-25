@@ -4,6 +4,7 @@ import { expireUnpaidOrders } from "@/server/services/orders";
 import { releaseSettlements } from "@/server/services/finance";
 import { retryDueWebhooks } from "@/server/services/webhooks";
 import { runMonitoring } from "@/server/services/monitoring";
+import { purgeModerationRetention } from "@/server/services/moderation-admin";
 import { runReconciliation } from "@/server/services/reconciliation";
 
 /**
@@ -23,6 +24,7 @@ async function handler(req: Request) {
     ["webhooks", () => retryDueWebhooks()],
     ["reconciliation", () => runReconciliation()],
     ["monitoring", () => runMonitoring()],
+    ["moderation-retention", () => purgeModerationRetention()],
   ] as const) {
     try { out[name] = await fn(); } catch (e) { out[name] = { error: (e as Error).message }; }
   }

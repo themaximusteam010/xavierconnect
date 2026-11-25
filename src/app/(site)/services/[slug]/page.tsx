@@ -46,6 +46,7 @@ export default async function ServicePage({ params, searchParams }: { params: Pr
           <h1 className="text-2xl font-semibold leading-tight sm:text-[28px]">{s.title}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-ink-muted">
             <Link href={`/store/${store.slug}`} className="flex items-center gap-1 text-ink-2 hover:text-brand">{store.name}<VerifiedMark level={s.vendor.verificationLevel} /></Link>
+            <a href={`/messages/start?vendor=${s.vendorId}&service=${s.id}`} className="font-medium text-brand hover:underline">Message provider</a>
             <span className="flex items-center gap-1"><MapPin className="size-3" />{s.location === "REMOTE" ? "Remote" : s.location === "BOTH" ? `Remote or on-site in ${s.state}` : [s.city, s.state].filter(Boolean).join(", ")}</span>
             <Stars value={s.ratingAvg} count={s.ratingCount} size={12} />
           </div>

@@ -40,3 +40,11 @@ switched on under **Admin → Integrations**, with credentials and approvals in 
 - Automated subscription billing for paid vendor plans (admin assigns plans; invoicing is manual).
 - Buyer-side international checkout (buyers are assumed to be in Nigeria).
 - Chargeback handling beyond what the collection provider's dashboard offers.
+
+## Identity and messaging
+
+| Dependency | Status | Needed |
+|---|---|---|
+| Google OAuth client (Sign in with Google) | Implemented and tested against a local mock OpenID provider and Google's live discovery document; **not yet tested with a real Google client** | Create the OAuth client in Google Cloud Console (docs/GOOGLE_SIGN_IN.md) and set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` |
+| ClamAV (attachment malware scan) | Implemented (clamd INSTREAM), tested against a protocol stub only | A clamd service reachable from the app (`CLAMAV_HOST`). Vercel cannot run clamd itself; use a small hosted container |
+| OCR (Tesseract) and QR (jsQR) | Bundled, no external service | — |

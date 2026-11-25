@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { unlinkGoogle, LinkRefused } from "@/server/services/google-accounts";
 import { db } from "@/server/db";
 import { requireUser } from "@/server/auth/session";
 import { hashPassword, verifyPassword } from "@/server/auth/password";
@@ -57,6 +58,7 @@ export async function changePasswordAction(_: ActionState, fd: FormData): Promis
   const parsed = z.object({ current: z.string().min(1, "Enter your current password"), next: password }).safeParse(Object.fromEntries(fd));
   if (!parsed.success) return { ok: false, errors: fieldErrors(parsed.error) };
   const row = await db.user.findUniqueOrThrow({ where: { id: u.id } });
+  if (!row.passwordHash) return { ok: false, message: "Your account signs in with Google and has no password yet. Use “Forgot password” on the sign-in page to set one by email." };
   if (!(await verifyPassword(row.passwordHash, parsed.data.current))) return { ok: false, errors: { current: ["That is not your current password"] } };
   await db.user.update({ where: { id: u.id }, data: { passwordHash: await hashPassword(parsed.data.next) } });
   return { ok: true, message: "Password changed." };
@@ -108,4 +110,10 @@ export async function replyTicketAction(fd: FormData) {
     db.supportTicket.update({ where: { id: t.id }, data: { status: t.status === "RESOLVED" || t.status === "PENDING_CUSTOMER" ? "OPEN" : t.status } }),
   ]);
   revalidatePath(`/account/support/${number}`);
+}
+
+export async function unlinkGoogleAction() {
+  const u = await requireUser();
+  try { await unlinkGoogle(u.id); } catch (e) { if (e instanceof LinkRefused) redirect(`/account/settings?error=${encodeURIComponent(e.message)}`); throw e; }
+  redirect(`/account/settings?ok=${encodeURIComponent("Google account disconnected.")}`);
 }
