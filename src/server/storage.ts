@@ -2,11 +2,15 @@
  * File storage. STORAGE_DRIVER=local writes under ./storage/{public,private}.
  * Public files are served by /media/<key>; private files are never served directly —
  * only through authorised routes such as /download/<grantId>.
- * An S3/R2 driver can implement the same three functions (see docs/ARCHITECTURE.md).
+ * STORAGE_DRIVER=db stores bytes in the StoredFile table (used on Vercel, whose disk is read-only).
+ * An S3/R2 driver can implement the same functions for large-scale use (see docs/ARCHITECTURE.md).
  */
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { db } from "@/server/db";
+
+const DRIVER = process.env.STORAGE_DRIVER ?? "local";
 
 const ROOT = path.resolve(process.cwd(), "storage");
 
@@ -31,6 +35,10 @@ function safeKey(key: string) {
 
 async function put(visibility: "public" | "private", folder: string, ext: string, buf: Buffer) {
   const key = `${visibility}/${folder}/${randomUUID()}.${ext}`;
+  if (DRIVER === "db") {
+    await db.storedFile.create({ data: { key, mimeType: MIME[ext] ?? "application/octet-stream", size: buf.length, data: new Uint8Array(buf) } });
+    return key;
+  }
   const full = safeKey(key);
   await mkdir(path.dirname(full), { recursive: true });
   await writeFile(full, buf);
@@ -68,7 +76,12 @@ export async function saveDigitalAsset(file: File, folder: string) {
   return { key: await put("private", folder, t.ext, buf), size: buf.length, ext: t.ext };
 }
 
-export async function readStored(key: string) {
+export async function readStored(key: string): Promise<Buffer> {
+  if (DRIVER === "db") {
+    const f = await db.storedFile.findUnique({ where: { key } });
+    if (!f) throw new Error("not found");
+    return Buffer.from(f.data);
+  }
   return readFile(safeKey(key));
 }
 

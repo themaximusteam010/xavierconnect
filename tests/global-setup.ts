@@ -23,7 +23,7 @@ export default function setup() {
   if (base === (process.env.DATABASE_URL ?? env.DATABASE_URL)) throw new Error("TEST_DATABASE_URL must differ from DATABASE_URL");
   const schema = `t_${Date.now().toString(36)}_${process.pid}`;
   const url = `${base}${base.includes("?") ? "&" : "?"}schema=${schema}`;
-  execSync("npx prisma migrate deploy", { stdio: "pipe", env: { ...process.env, DATABASE_URL: url } });
+  execSync("npx prisma migrate deploy", { stdio: "pipe", env: { ...process.env, DATABASE_URL: url, DIRECT_URL: url } });
   writeFileSync("node_modules/.xc-test-db-url", url);
   return () => {
     // Drop only the schema this run created.
