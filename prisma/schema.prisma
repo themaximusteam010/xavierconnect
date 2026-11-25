@@ -33,6 +33,7 @@ model User {
   emailVerifiedAt DateTime?
   mfaSecret       String?
   mfaEnabledAt    DateTime?
+  mfaRecoveryCodes String[] // sha256 hashes of one-time recovery codes
   lastLoginAt     DateTime?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -116,6 +117,7 @@ model Session {
   userAgent  String?
   createdAt  DateTime @default(now())
   lastSeenAt DateTime @default(now())
+  mfaVerifiedAt DateTime?
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -201,6 +203,10 @@ model Vendor {
   state               String?
   country             String            @default("NG")
   rcNumber            String? // CAC registration number for registered businesses
+  region              String? // state/province for non-NG vendors
+  payoutCurrency      String            @default("NGN")
+  handlingDays        Int               @default(1)
+  internationalShipping Boolean         @default(false)
   onboardingStep      Int               @default(1)
   agreementAcceptedAt DateTime?
   agreementVersion    String?
@@ -223,6 +229,8 @@ model Vendor {
   payoutAccount   PayoutAccount?
   commissionRules CommissionRule[]
   ledgerAccounts  LedgerAccount[]
+  beneficiaries   Beneficiary[]
+  pickupAddresses PickupAddress[]
   coupons         Coupon[]
   conversations   Conversation[]
   subscription    VendorSubscription?
@@ -706,6 +714,9 @@ model VendorOrder {
   vendorNetMinor   BigInt            @default(0)
   shippingMethodId String?
   deliveredAt      DateTime?
+  deliveryEvidence String? // CARRIER | RIDER_POD | CUSTOMER_CONFIRMED | DIGITAL | SERVICE_COMPLETED | VENDOR_CLAIM | ADMIN
+  settlementCurrency String         @default("NGN")
+  processingFeeMinor BigInt         @default(0)
   settledAt        DateTime? // when earnings moved pending -> available
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
@@ -786,6 +797,7 @@ model Payment {
   currency        String               @default("NGN")
   status          PaymentAttemptStatus @default(INITIATED)
   channel         String?
+  feesMinor       BigInt               @default(0)
   providerPayload Json?
   failureReason   String?
   verifiedAt      DateTime?
@@ -805,6 +817,10 @@ model PaymentEvent {
   type        String
   payload     Json
   signatureOk Boolean
+  kind        String    @default("PAYMENT") // PAYMENT | PAYOUT | SHIPPING
+  attempts    Int       @default(0)
+  nextRetryAt DateTime?
+  deadLetteredAt DateTime?
   processedAt DateTime?
   error       String?
   createdAt   DateTime  @default(now())
@@ -946,6 +962,15 @@ model Payout {
   amountMinor    BigInt
   status         PayoutStatus @default(REQUESTED)
   idempotencyKey String       @unique
+  currency       String       @default("NGN") // ledger currency the amount is held in
+  beneficiaryId  String?
+  providerKey    String? // "manual" = finance pays by bank transfer and records the reference
+  method         String       @default("LOCAL") // LOCAL | CROSS_BORDER
+  settlementCurrency    String?
+  settlementAmountMinor BigInt?
+  fxRate         Decimal?     @db.Decimal(24, 12)
+  providerFeeMinor BigInt     @default(0)
+  initiatedAt    DateTime?
   providerRef    String?
   failureReason  String?
   reviewedById   String?
@@ -955,6 +980,9 @@ model Payout {
   updatedAt      DateTime     @updatedAt
   vendor         Vendor       @relation(fields: [vendorId], references: [id])
   reviewedBy     User?        @relation("PayoutReviewer", fields: [reviewedById], references: [id])
+  beneficiary    Beneficiary? @relation(fields: [beneficiaryId], references: [id])
+  events         PayoutEvent[]
+  fxQuote        FxQuote?
 
   @@index([vendorId, status])
 }
@@ -976,6 +1004,7 @@ model ShippingMethod {
   perKgMinor    BigInt           @default(0)
   freeOverMinor BigInt? // free shipping when vendor subtotal >= this
   states        String[] // empty = nationwide
+  destinationCountries String[] // empty = vendor's own country only
   etaDaysMin    Int              @default(1)
   etaDaysMax    Int              @default(5)
   active        Boolean          @default(true)
@@ -1003,6 +1032,19 @@ model Shipment {
   deliveryPartnerId String?
   proofOfDeliveryKey String?
   recipientName     String?
+  providerKey       String?
+  providerShipmentId String?
+  service           String?
+  costMinor         BigInt?
+  costCurrency      String?
+  labelUrl          String?
+  trackingUrl       String?
+  international     Boolean         @default(false)
+  originCountry     String?
+  destinationCountry String?
+  weightGrams       Int?
+  lastEventAt       DateTime?
+  failureReason     String?
   shippedAt         DateTime?
   deliveredAt       DateTime?
   createdAt         DateTime        @default(now())
@@ -1010,12 +1052,14 @@ model Shipment {
   vendorOrder       VendorOrder     @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
   deliveryPartner   User?           @relation(fields: [deliveryPartnerId], references: [id])
   events            ShipmentEvent[]
+  customs           CustomsDeclaration?
 
   @@index([deliveryPartnerId, status])
 }
 
 model ShipmentEvent {
   id         String         @id @default(cuid())
+  providerEventId String?   @unique
   shipmentId String
   status     ShipmentStatus
   location   String?
@@ -1414,4 +1458,230 @@ model StoredFile {
   size      Int
   data      Bytes
   createdAt DateTime @default(now())
+}
+
+
+// ───────────────────────────── Integrations, payouts, FX, shipping (Nov 2026) ─────────────────────────────
+
+enum ProviderMode {
+  SANDBOX
+  LIVE
+}
+
+enum ProviderApproval {
+  NOT_REQUIRED
+  NOT_STARTED
+  APPLIED
+  APPROVED
+  REJECTED
+}
+
+/// Admin-configured payment or shipping provider. Capabilities come from the code adapter.
+model IntegrationProvider {
+  id               String           @id @default(cuid())
+  key              String           @unique // matches an adapter key, e.g. paystack, shipbubble
+  kind             String // PAYMENT | SHIPPING
+  name             String
+  active           Boolean          @default(false)
+  mode             ProviderMode     @default(SANDBOX)
+  approval         ProviderApproval @default(NOT_STARTED)
+  countries        String[]
+  currencies       String[]
+  methods          String[]
+  credentialsEnc   String? // AES-256-GCM, never sent to the browser
+  credentialHint   String? // last 4 characters only
+  webhookSecretEnc String?
+  feeBps           Int              @default(0)
+  feeFixedMinor    BigInt           @default(0)
+  notes            String?
+  lastCheckAt      DateTime?
+  lastCheckOk      Boolean?
+  lastCheckMessage String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+/// Which provider pays vendors in a given country/currency. LIVE requires provider approval + compliance sign-off.
+model PayoutCorridor {
+  id                 String   @id @default(cuid())
+  country            String
+  currency           String
+  providerKey        String
+  method             String // LOCAL | CROSS_BORDER
+  status             String   @default("DISABLED") // DISABLED | SANDBOX | LIVE
+  complianceApproved Boolean  @default(false)
+  complianceNote     String?
+  minPayoutMinor     BigInt?
+  updatedAt          DateTime @updatedAt
+
+  @@unique([country, currency, providerKey])
+}
+
+enum BeneficiaryStatus {
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
+  DISABLED
+}
+
+/// Vendor payout destination. Only a masked view is stored in clear; full details are encrypted and
+/// kept only until the provider has tokenised them (providerRecipientRef).
+model Beneficiary {
+  id                   String            @id @default(cuid())
+  vendorId             String
+  providerKey          String
+  country              String
+  currency             String
+  routingType          String // NUBAN | CNAPS | SWIFT | IBAN | ABA | SORT_CODE
+  bankName             String
+  bankCode             String?
+  branch               String?
+  accountHolderName    String
+  verifiedName         String?
+  accountLast4         String
+  detailsEnc           String?
+  providerRecipientRef String?
+  status               BeneficiaryStatus @default(PENDING_VERIFICATION)
+  failureReason        String?
+  isDefault            Boolean           @default(false)
+  verifiedAt           DateTime?
+  disabledAt           DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  vendor               Vendor            @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  payouts              Payout[]
+
+  @@index([vendorId, status])
+}
+
+model FxQuote {
+  id                String   @id @default(cuid())
+  providerKey       String
+  sourceCurrency    String
+  targetCurrency    String
+  sourceAmountMinor BigInt
+  targetAmountMinor BigInt
+  rate              Decimal  @db.Decimal(24, 12)
+  feeMinor          BigInt   @default(0) // in source currency
+  providerQuoteRef  String?
+  status            String   @default("OPEN") // OPEN | ACCEPTED | EXPIRED
+  expiresAt         DateTime
+  payoutId          String?  @unique
+  createdAt         DateTime @default(now())
+  payout            Payout?  @relation(fields: [payoutId], references: [id])
+}
+
+model PayoutEvent {
+  id        String   @id @default(cuid())
+  payoutId  String
+  status    String
+  message   String?
+  payload   Json?
+  createdAt DateTime @default(now())
+  payout    Payout   @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+
+  @@index([payoutId])
+}
+
+/// One row per outbound provider call (no secrets, no full account numbers).
+model IntegrationLog {
+  id          String   @id @default(cuid())
+  providerKey String
+  operation   String
+  status      String // OK | ERROR
+  httpStatus  Int?
+  durationMs  Int?
+  reference   String?
+  message     String?
+  createdAt   DateTime @default(now())
+
+  @@index([providerKey, createdAt])
+  @@index([status, createdAt])
+}
+
+model AdminAlert {
+  id          String    @id @default(cuid())
+  dedupeKey   String    @unique
+  type        String
+  severity    String // INFO | WARNING | CRITICAL
+  title       String
+  detail      String?
+  link        String?
+  count       Int       @default(1)
+  firstSeenAt DateTime  @default(now())
+  lastSeenAt  DateTime  @default(now())
+  resolvedAt  DateTime?
+  resolvedById String?
+
+  @@index([resolvedAt, severity])
+}
+
+model ReconciliationRecord {
+  id                  String   @id @default(cuid())
+  runAt               DateTime @default(now())
+  providerKey         String
+  kind                String // PAYMENT | PAYOUT
+  reference           String
+  internalAmountMinor BigInt?
+  providerAmountMinor BigInt?
+  currency            String
+  status              String // MATCHED | AMOUNT_MISMATCH | STATUS_MISMATCH | MISSING_AT_PROVIDER | UNVERIFIABLE
+  detail              String?
+
+  @@index([runAt])
+  @@index([status])
+}
+
+model PickupAddress {
+  id                   String   @id @default(cuid())
+  vendorId             String
+  label                String
+  contactName          String
+  phone                String
+  email                String
+  line1                String
+  line2                String?
+  city                 String
+  region               String
+  postalCode           String?
+  country              String
+  providerAddressCodes Json? // { "shipbubble": 123 }
+  isDefault            Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  vendor               Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@index([vendorId])
+}
+
+model ShippingQuote {
+  id                 String    @id @default(cuid())
+  providerKey        String
+  vendorId           String
+  vendorOrderId      String?
+  providerRequestRef String?
+  courierId          String?
+  serviceCode        String
+  courierName        String
+  amountMinor        BigInt
+  currency           String
+  etaText            String?
+  expiresAt          DateTime?
+  createdAt          DateTime  @default(now())
+
+  @@index([vendorOrderId])
+}
+
+model CustomsDeclaration {
+  id                 String   @id @default(cuid())
+  shipmentId         String   @unique
+  contents           String
+  declaredValueMinor BigInt
+  currency           String
+  originCountry      String
+  hsCodes            String[]
+  incoterm           String // DAP (recipient pays duties) | DDP (sender pays)
+  insured            Boolean  @default(false)
+  items              Json
+  createdAt          DateTime @default(now())
+  shipment           Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 }

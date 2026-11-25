@@ -20,7 +20,7 @@ export async function deliveryUpdateAction(fd: FormData) {
     db.shipmentEvent.create({ data: { shipmentId: id, status, note: status === "DELIVERED" ? `Received by ${recipient}${note ? ` — ${note}` : ""}` : note } }),
   ]);
   if (status === "DELIVERED" && s!.vendorOrder.status === "SHIPPED") {
-    await updateVendorOrderStatus(s!.vendorOrder.vendorId, s!.vendorOrderId, "DELIVERED", u.id, { note: `Proof of delivery: received by ${recipient}` });
+    await updateVendorOrderStatus(s!.vendorOrder.vendorId, s!.vendorOrderId, "DELIVERED", u.id, { note: `Proof of delivery: received by ${recipient}`, evidence: "RIDER_POD" });
   }
   redirect("/delivery?ok=Updated");
 }

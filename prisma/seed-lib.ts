@@ -266,6 +266,38 @@ async function demo() {
   console.log("Demo catalogue ready.");
 }
 
+/**
+ * Provider and payout-corridor configuration. Creates rows that don't exist; never overwrites admin changes.
+ * Sandbox simulators start active (they refuse to run in production unless ALLOW_SANDBOX_PAYMENTS=true).
+ * Real providers start inactive until an admin adds credentials and tests the connection.
+ */
+export async function seedIntegrations(client: PrismaClient) {
+  const providers = [
+    { key: "paystack", kind: "PAYMENT", name: "Paystack", active: false, approval: "NOT_STARTED", countries: ["NG"], currencies: ["NGN"], methods: ["card", "bank_transfer", "ussd"] },
+    { key: "flutterwave", kind: "PAYMENT", name: "Flutterwave", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [] },
+    { key: "chamsswitch-kardit", kind: "PAYMENT", name: "ChamsSwitch — Kardit", active: false, approval: "NOT_STARTED", countries: ["CN"], currencies: ["CNY"], methods: ["bank_transfer"], notes: "Partnership review required for marketplace (third-party seller) settlement." },
+    { key: "manual", kind: "PAYMENT", name: "Manual bank transfer", active: true, approval: "NOT_REQUIRED", countries: ["NG"], currencies: ["NGN"], methods: ["bank_transfer"] },
+    { key: "sandbox-payouts", kind: "PAYMENT", name: "Sandbox domestic payouts", active: true, approval: "NOT_REQUIRED", countries: ["NG"], currencies: ["NGN"], methods: ["bank_transfer"] },
+    { key: "sandbox-crossborder", kind: "PAYMENT", name: "Sandbox cross-border partner", active: true, approval: "NOT_REQUIRED", countries: ["CN"], currencies: ["CNY"], methods: ["bank_transfer"] },
+    { key: "shipbubble", kind: "SHIPPING", name: "Shipbubble", active: false, approval: "NOT_STARTED", countries: ["NG"], currencies: ["NGN"], methods: [] },
+    { key: "dhl-express", kind: "SHIPPING", name: "DHL Express", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [] },
+    { key: "nipost", kind: "SHIPPING", name: "NIPOST", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [] },
+    { key: "sandbox-shipping", kind: "SHIPPING", name: "Sandbox carrier", active: true, approval: "NOT_REQUIRED", countries: ["NG", "CN", "GH", "GB", "US"], currencies: ["NGN"], methods: [] },
+  ] as const;
+  for (const p of providers) {
+    await client.integrationProvider.upsert({ where: { key: p.key }, update: {}, create: { ...p, countries: [...p.countries], currencies: [...p.currencies], methods: [...p.methods] } });
+  }
+  const corridors = [
+    { country: "NG", currency: "NGN", providerKey: "sandbox-payouts", method: "LOCAL", status: "SANDBOX", complianceNote: "Test mode only." },
+    { country: "NG", currency: "NGN", providerKey: "paystack", method: "LOCAL", status: "DISABLED", complianceNote: "Enable after Paystack transfers are approved on the live account." },
+    { country: "CN", currency: "CNY", providerKey: "sandbox-crossborder", method: "CROSS_BORDER", status: "SANDBOX", complianceNote: "Test mode only — no real CNY settlement." },
+    { country: "CN", currency: "CNY", providerKey: "chamsswitch-kardit", method: "CROSS_BORDER", status: "DISABLED", complianceNote: "Awaiting ChamsSwitch partnership review for marketplace seller settlement, API access and CBN/PBoC compliance confirmation." },
+  ];
+  for (const c of corridors) {
+    await client.payoutCorridor.upsert({ where: { country_currency_providerKey: { country: c.country, currency: c.currency, providerKey: c.providerKey } }, update: {}, create: c });
+  }
+}
+
 /** Idempotent: safe to run more than once. */
 export async function runSeed(client: PrismaClient, options: SeedOptions = {}) {
   db = client;
@@ -273,6 +305,7 @@ export async function runSeed(client: PrismaClient, options: SeedOptions = {}) {
   await syncRbac(db);
   await categories();
   await platform();
+  await seedIntegrations(db);
   await admin();
   if (opts.demo) await demo();
   return { ok: true };

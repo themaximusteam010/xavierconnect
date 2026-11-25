@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { db } from "@/server/db";
-import { requireUser } from "@/server/auth/session";
+import { mfaRequired, requireUser } from "@/server/auth/session";
 import { DashShell } from "@/components/layout/dash-shell";
 import type { Permission } from "@/server/auth/rbac";
 
@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const u = await requireUser("/admin");
   if (!u.permissions.has("admin.access")) redirect("/account");
+  if (mfaRequired() && !(u.mfaEnabled && u.mfaVerified)) redirect("/mfa");
   const has = (p: Permission) => u.permissions.has(p);
   const [apps, listings, payouts, tickets] = await Promise.all([
     has("vendor.view") ? db.vendor.count({ where: { status: "SUBMITTED" } }) : 0,

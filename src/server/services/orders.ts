@@ -113,6 +113,7 @@ export async function placeOrder(input: PlaceOrderInput) {
             commissionMinor: v.commissionMinor,
             vendorNetMinor: v.vendorNetMinor,
             shippingMethodId: view.shippingByVendor[v.vendorId]?.id ?? null,
+            settlementCurrency: items.find((i) => i.product.vendorId === v.vendorId)?.product.vendor.payoutCurrency ?? "NGN",
           },
         });
         for (const l of v.lines) {
@@ -300,7 +301,7 @@ async function finaliseOrder(tx: Tx, orderId: string) {
   for (const vo of order.vendorOrders) {
     const allDigital = vo.items.every((i) => i.kind === "DIGITAL");
     const status: VendorOrderStatus = allDigital ? "DELIVERED" : "NEW";
-    await tx.vendorOrder.update({ where: { id: vo.id }, data: { status, deliveredAt: allDigital ? now : null } });
+    await tx.vendorOrder.update({ where: { id: vo.id }, data: { status, deliveredAt: allDigital ? now : null, deliveryEvidence: allDigital ? "DIGITAL" : null } });
     await tx.vendorOrderEvent.create({ data: { vendorOrderId: vo.id, status, note: allDigital ? "Digital delivery on payment" : "Payment confirmed" } });
 
     for (const it of vo.items.filter((i) => i.kind === "DIGITAL" && i.productId)) {
@@ -380,7 +381,7 @@ export async function updateVendorOrderStatus(
   vendorOrderId: string,
   next: VendorOrderStatus,
   actorId: string,
-  extra: { carrier?: string; trackingNumber?: string; note?: string } = {},
+  extra: { carrier?: string; trackingNumber?: string; note?: string; evidence?: string } = {},
 ) {
   return db.$transaction(async (tx) => {
     const vo = await tx.vendorOrder.findFirst({ where: { id: vendorOrderId, vendorId }, include: { order: true } });
@@ -389,10 +390,10 @@ export async function updateVendorOrderStatus(
     if (next === "CANCELLED") throw new FulfilmentError("Use the cancel-and-refund action for paid orders.");
 
     const now = new Date();
-    await tx.vendorOrder.update({ where: { id: vo.id }, data: { status: next, deliveredAt: next === "DELIVERED" ? now : undefined } });
+    await tx.vendorOrder.update({ where: { id: vo.id }, data: { status: next, deliveredAt: next === "DELIVERED" ? now : undefined, deliveryEvidence: next === "DELIVERED" ? extra.evidence ?? "VENDOR_CLAIM" : undefined } });
     await tx.vendorOrderEvent.create({ data: { vendorOrderId: vo.id, status: next, note: extra.note, actorId } });
 
-    if (next === "SHIPPED") {
+    if (next === "SHIPPED" && !(await tx.shipment.count({ where: { vendorOrderId: vo.id } }))) {
       const shipment = await tx.shipment.create({
         data: { vendorOrderId: vo.id, carrier: extra.carrier || "Vendor delivery", trackingNumber: extra.trackingNumber || null, status: "IN_TRANSIT", shippedAt: now },
       });

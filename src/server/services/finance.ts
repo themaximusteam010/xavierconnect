@@ -2,7 +2,7 @@
  * Settlement, payouts and refunds. Every money movement is a balanced ledger transaction with an
  * idempotency key, so retries and double-clicks cannot move money twice.
  */
-import { db, type Tx } from "@/server/db";
+import { db, type DbClient, type Tx } from "@/server/db";
 import { accountBalance, postLedger, PlatformAccounts, vendorAccountCode, vendorBalances } from "@/server/domain/ledger";
 import { getProvider } from "@/server/payments";
 import { getSetting } from "./settings";
@@ -16,15 +16,24 @@ export class FinanceError extends Error {}
  * Move vendor earnings from pending → available for vendor orders delivered at least
  * `holdDays` ago (the return/dispute window). Orders with an open dispute are skipped.
  */
+export const STRONG_EVIDENCE = ["CARRIER", "RIDER_POD", "CUSTOMER_CONFIRMED", "DIGITAL", "SERVICE_COMPLETED", "ADMIN"];
+
 export async function releaseSettlements(now = new Date(), holdDays?: number) {
   const hold = holdDays ?? (await getSetting(db, "settlementHoldDays"));
+  const claimHold = await getSetting(db, "vendorClaimHoldDays");
   const cutoff = new Date(now.getTime() - hold * 864e5);
+  const claimCutoff = new Date(now.getTime() - Math.max(hold, claimHold) * 864e5);
   const due = await db.vendorOrder.findMany({
     where: {
       status: "DELIVERED",
       settledAt: null,
-      deliveredAt: { lte: cutoff },
       disputes: { none: { status: { in: ["OPEN", "AWAITING_VENDOR", "UNDER_REVIEW"] } } },
+      OR: [
+        // Verified delivery evidence: normal hold window.
+        { deliveryEvidence: { in: STRONG_EVIDENCE }, deliveredAt: { lte: cutoff } },
+        // Only the vendor's own claim: longer window for the customer to object.
+        { OR: [{ deliveryEvidence: "VENDOR_CLAIM" }, { deliveryEvidence: null }], deliveredAt: { lte: claimCutoff } },
+      ],
     },
     select: { id: true },
   });
@@ -61,14 +70,23 @@ export async function requestPayout(vendorId: string, amountMinor: bigint, actor
   return db.$transaction(async (tx) => {
     const existing = await tx.payout.findUnique({ where: { idempotencyKey } });
     if (existing) return existing;
-    const vendor = await tx.vendor.findUniqueOrThrow({ where: { id: vendorId }, include: { payoutAccount: true } });
+    const vendor = await tx.vendor.findUniqueOrThrow({ where: { id: vendorId } });
     if (vendor.status !== "APPROVED") throw new FinanceError("Your store must be approved to withdraw.");
-    if (!vendor.payoutAccount?.verifiedAt) throw new FinanceError("Add and verify a payout bank account first.");
+    const beneficiary = await tx.beneficiary.findFirst({ where: { vendorId, status: "VERIFIED", isDefault: true, disabledAt: null } });
+    if (!beneficiary) throw new FinanceError("Add a verified payout account in Payments & payouts first.");
+    const corridor = await resolveCorridor(tx, beneficiary.country, beneficiary.currency, beneficiary.providerKey);
     // Serialise per vendor so two concurrent requests cannot both pass the balance check.
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${"payout:" + vendorId}))`;
     const available = await accountBalance(tx, vendorAccountCode(vendorId, "available"));
     if (amountMinor > available) throw new FinanceError("Amount exceeds your available balance.");
-    const payout = await tx.payout.create({ data: { vendorId, amountMinor, idempotencyKey } });
+    const payout = await tx.payout.create({
+      data: {
+        vendorId, amountMinor, idempotencyKey, currency: "NGN", beneficiaryId: beneficiary.id, providerKey: beneficiary.providerKey,
+        method: corridor.method, settlementCurrency: beneficiary.currency,
+        settlementAmountMinor: beneficiary.currency === "NGN" ? amountMinor : null,
+      },
+    });
+    await tx.payoutEvent.create({ data: { payoutId: payout.id, status: "REQUESTED", message: `To ${beneficiary.bankName} ••••${beneficiary.accountLast4} (${beneficiary.currency})` } });
     await postLedger(tx, {
       kind: "PAYOUT_REQUESTED",
       reference: payout.id,
@@ -79,22 +97,38 @@ export async function requestPayout(vendorId: string, amountMinor: bigint, actor
         { account: vendorAccountCode(vendorId, "payout_hold"), credit: amountMinor },
       ],
     });
-    await audit(tx, { actorId, action: "payout.request", entityType: "Payout", entityId: payout.id, after: { amountMinor } });
+    await audit(tx, { actorId, action: "payout.request", entityType: "Payout", entityId: payout.id, after: { amountMinor, beneficiaryId: beneficiary.id } });
     return payout;
   });
 }
 
-async function lockPayout(tx: Tx, id: string) {
+/** A corridor must exist and be enabled. LIVE corridors additionally need compliance sign-off. */
+export async function resolveCorridor(tx: DbClient, country: string, currency: string, providerKey: string) {
+  if (providerKey === "manual" && country === "NG" && currency === "NGN") return { method: "LOCAL", status: "LIVE" };
+  const c = await tx.payoutCorridor.findUnique({ where: { country_currency_providerKey: { country, currency, providerKey } } });
+  if (!c || c.status === "DISABLED") throw new FinanceError(`Payouts to ${country} in ${currency} are not available yet.`);
+  if (c.status === "LIVE" && !c.complianceApproved) throw new FinanceError(`The ${country}/${currency} payout route is awaiting compliance approval.`);
+  if (c.status === "SANDBOX" && process.env.NODE_ENV === "production" && process.env.ALLOW_SANDBOX_PAYMENTS !== "true") {
+    throw new FinanceError(`The ${country}/${currency} payout route is only enabled in test mode.`);
+  }
+  return c;
+}
+
+export async function lockPayout(tx: Tx, id: string) {
   await tx.$queryRaw`SELECT id FROM "Payout" WHERE id = ${id} FOR UPDATE`;
   return tx.payout.findUniqueOrThrow({ where: { id }, include: { vendor: true } });
 }
 
 /** Finance approves and records the completed bank transfer. */
-export async function markPayoutPaid(payoutId: string, actorId: string, providerRef: string) {
+export async function markPayoutPaid(payoutId: string, actorId: string | null, providerRef: string, opts: { providerConfirmed?: boolean } = {}) {
   return db.$transaction(async (tx) => {
     const p = await lockPayout(tx, payoutId);
     if (p.status === "PAID") return p;
     if (!["REQUESTED", "APPROVED", "PROCESSING"].includes(p.status)) throw new FinanceError(`Payout is ${p.status}.`);
+    // API providers are only marked paid by their own confirmation (webhook), never by hand.
+    if (p.providerKey && p.providerKey !== "manual" && !opts.providerConfirmed) {
+      throw new FinanceError("This payout is sent through a payment provider; it is marked paid only when the provider confirms it.");
+    }
     await postLedger(tx, {
       kind: "PAYOUT_PAID",
       reference: p.id,
@@ -107,8 +141,9 @@ export async function markPayoutPaid(payoutId: string, actorId: string, provider
     });
     const updated = await tx.payout.update({
       where: { id: p.id },
-      data: { status: "PAID", providerRef, reviewedById: actorId, reviewedAt: new Date(), paidAt: new Date() },
+      data: { status: "PAID", providerRef, ...(actorId ? { reviewedById: actorId, reviewedAt: new Date() } : {}), paidAt: new Date() },
     });
+    await tx.payoutEvent.create({ data: { payoutId: p.id, status: "PAID", message: opts.providerConfirmed ? `Provider confirmed (${providerRef})` : `Bank reference recorded (${providerRef})` } });
     await audit(tx, { actorId, action: "payout.paid", entityType: "Payout", entityId: p.id, before: { status: p.status }, after: { status: "PAID", providerRef } });
     await notify(tx, { userId: p.vendor.ownerId, type: "payout.update", title: "Withdrawal paid", body: `Your withdrawal has been transferred. Reference ${providerRef}.`, link: "/vendor/earnings" });
     return updated;
@@ -116,7 +151,7 @@ export async function markPayoutPaid(payoutId: string, actorId: string, provider
 }
 
 /** Reject a request or record a failed transfer: funds return to the vendor's available balance. */
-export async function failPayout(payoutId: string, actorId: string, reason: string, status: "REJECTED" | "FAILED") {
+export async function failPayout(payoutId: string, actorId: string | null, reason: string, status: "REJECTED" | "FAILED") {
   return db.$transaction(async (tx) => {
     const p = await lockPayout(tx, payoutId);
     if (p.status === "REJECTED" || p.status === "FAILED") return p;
@@ -131,7 +166,8 @@ export async function failPayout(payoutId: string, actorId: string, reason: stri
         { account: vendorAccountCode(p.vendorId, "available"), credit: p.amountMinor },
       ],
     });
-    const updated = await tx.payout.update({ where: { id: p.id }, data: { status, failureReason: reason, reviewedById: actorId, reviewedAt: new Date() } });
+    const updated = await tx.payout.update({ where: { id: p.id }, data: { status, failureReason: reason, ...(actorId ? { reviewedById: actorId, reviewedAt: new Date() } : {}) } });
+    await tx.payoutEvent.create({ data: { payoutId: p.id, status, message: reason } });
     await audit(tx, { actorId, action: `payout.${status.toLowerCase()}`, entityType: "Payout", entityId: p.id, before: { status: p.status }, after: { status, reason } });
     await notify(tx, { userId: p.vendor.ownerId, type: "payout.update", title: "Withdrawal not completed", body: `${reason}. The amount is back in your available balance.`, link: "/vendor/earnings" });
     return updated;

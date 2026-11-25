@@ -2,7 +2,8 @@ import type { DbClient } from "@/server/db";
 
 export const SETTING_DEFAULTS = {
   taxBps: 0, // VAT collected at checkout (0 by default; set 750 for 7.5% VAT)
-  settlementHoldDays: 3, // days after delivery before earnings become withdrawable
+  settlementHoldDays: 3, // days after verified delivery before earnings become withdrawable
+  vendorClaimHoldDays: 14, // when the only evidence is the vendor's own "delivered" claim
   minPayoutMinor: "500000", // ₦5,000
   reservationMinutes: 30, // how long unpaid orders hold stock
   downloadMaxCount: 5,

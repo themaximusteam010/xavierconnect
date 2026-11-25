@@ -48,7 +48,13 @@ export interface CurrentUser {
   permissions: Set<Permission>;
   vendorIds: string[];
   isStaff: boolean;
+  sessionId: string;
+  mfaEnabled: boolean;
+  mfaVerified: boolean;
 }
+
+export const STAFF_ROLES = ["SUPER_ADMIN", "MARKETPLACE_ADMIN", "MARKETPLACE_MANAGER", "FINANCE_MANAGER", "VENDOR_MANAGER", "SUPPORT_AGENT", "CONTENT_MANAGER"];
+export const mfaRequired = () => process.env.ADMIN_MFA_REQUIRED !== "false";
 
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
@@ -69,7 +75,10 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     grants,
     permissions: permissionsFor(grants),
     vendorIds: [...new Set(grants.filter((g) => g.vendorId).map((g) => g.vendorId!))],
-    isStaff: grants.some((g) => ["SUPER_ADMIN", "MARKETPLACE_ADMIN", "MARKETPLACE_MANAGER", "FINANCE_MANAGER", "VENDOR_MANAGER", "SUPPORT_AGENT", "CONTENT_MANAGER"].includes(g.role)),
+    isStaff: grants.some((g) => STAFF_ROLES.includes(g.role)),
+    sessionId: session.id,
+    mfaEnabled: !!u.mfaEnabledAt,
+    mfaVerified: !!session.mfaVerifiedAt,
   };
 });
 
@@ -85,9 +94,11 @@ export async function requireUser(nextPath?: string): Promise<CurrentUser> {
   return u;
 }
 
+/** Server-side check used by every admin action. Staff must have completed MFA in this session. */
 export async function requirePermission(p: Permission): Promise<CurrentUser> {
   const u = await requireUser("/admin");
   if (!u.permissions.has(p)) throw new AuthError("FORBIDDEN", `Missing permission ${p}`);
+  if (u.isStaff && mfaRequired() && !(u.mfaEnabled && u.mfaVerified)) redirect("/mfa");
   return u;
 }
 

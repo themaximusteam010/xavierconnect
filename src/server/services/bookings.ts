@@ -77,7 +77,7 @@ export async function createBooking(input: { customerId: string; email: string; 
     const number = await nextOrderNumber(tx);
     const order = await tx.order.create({ data: { number, userId: input.customerId, subtotalMinor: pricing.subtotalMinor, totalMinor: pricing.totalMinor, taxMinor: pricing.taxMinor } });
     const vo = await tx.vendorOrder.create({
-      data: { number: `${number}-A`, orderId: order.id, vendorId: service.vendorId, subtotalMinor: v.subtotalMinor, taxMinor: v.taxMinor, totalMinor: v.totalMinor, commissionMinor: v.commissionMinor, vendorNetMinor: v.vendorNetMinor },
+      data: { number: `${number}-A`, orderId: order.id, vendorId: service.vendorId, settlementCurrency: service.vendor.payoutCurrency, subtotalMinor: v.subtotalMinor, taxMinor: v.taxMinor, totalMinor: v.totalMinor, commissionMinor: v.commissionMinor, vendorNetMinor: v.vendorNetMinor },
     });
     const item = await tx.orderItem.create({
       data: { orderId: order.id, vendorOrderId: vo.id, kind: "SERVICE", name: `${service.title} — ${pkg.name}`, unitPriceMinor: pkg.priceMinor, quantity: 1, lineTotalMinor: pkg.priceMinor, commissionMinor: v.commissionMinor, commissionRuleId: v.lines[0].commissionRuleId },
@@ -110,7 +110,7 @@ export async function setBookingStatus(vendorId: string, bookingId: string, next
   if (b.orderItem) {
     if (next === "COMPLETED") {
       // Completion counts as delivery: the settlement hold window starts now.
-      await db.vendorOrder.update({ where: { id: b.orderItem.vendorOrderId }, data: { status: "DELIVERED", deliveredAt: new Date() } });
+      await db.vendorOrder.update({ where: { id: b.orderItem.vendorOrderId }, data: { status: "DELIVERED", deliveredAt: new Date(), deliveryEvidence: "SERVICE_COMPLETED" } });
       await db.vendorOrderEvent.create({ data: { vendorOrderId: b.orderItem.vendorOrderId, status: "DELIVERED", note: "Service completed", actorId } });
     }
     if (next === "CANCELLED") {

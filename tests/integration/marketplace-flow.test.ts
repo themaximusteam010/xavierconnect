@@ -13,6 +13,7 @@ import { failPayout, markPayoutPaid, refundVendorOrder, releaseSettlements, requ
 import { reviewApplication, startApplication, submitApplication, VENDOR_AGREEMENT_VERSION } from "@/server/services/vendors";
 import { moderateProduct, submitProductForReview } from "@/server/services/catalog";
 import { accountBalance, PlatformAccounts, vendorBalances } from "@/server/domain/ledger";
+import { confirmReceipt } from "@/server/services/disputes";
 
 const address = { fullName: "Test Buyer", phone: "08030000000", line1: "1 Test Street", city: "Ikeja", state: "Lagos", country: "NG" };
 let adminId: string;
@@ -44,6 +45,8 @@ async function makeApprovedVendor(n: number, priceMinor: bigint, stock: number) 
   });
   await submitApplication(v.id, owner.id);
   await reviewApplication(v.id, adminId, "APPROVE", null);
+  // Finance pays this vendor by manual bank transfer (no payout API) — the only path where staff record "paid".
+  await db.beneficiary.create({ data: { vendorId: v.id, providerKey: "manual", country: "NG", currency: "NGN", routingType: "NUBAN", bankName: "Test Bank", bankCode: "000", accountHolderName: `Vendor ${n}`, accountLast4: "1234", status: "VERIFIED", isDefault: true, verifiedAt: new Date() } });
 
   const cat = await db.category.upsert({ where: { slug: "test-cat" }, update: {}, create: { slug: "test-cat", name: "Test", kind: "PRODUCT" } });
   const p = await db.product.create({
@@ -124,7 +127,8 @@ describe("Workflows C–E: multi-vendor purchase, settlement, payout, refund", (
     await approveSandbox(reference);
     const results = await Promise.all([confirmPayment(reference), confirmPayment(reference), confirmPayment(reference)]);
     expect(results.filter((r) => r.outcome === "paid")).toHaveLength(1);
-    expect(await db.ledgerTransaction.count({ where: { kind: "PAYMENT_CAPTURED" } })).toBe(1);
+    const number = (await db.order.findUniqueOrThrow({ where: { id: orderId } })).number;
+    expect(await db.ledgerTransaction.count({ where: { kind: "PAYMENT_CAPTURED", reference: number } })).toBe(1);
 
     const order = await db.order.findUniqueOrThrow({ where: { id: orderId }, include: { vendorOrders: true } });
     expect(order.paymentStatus).toBe("PAID");
@@ -133,8 +137,10 @@ describe("Workflows C–E: multi-vendor purchase, settlement, payout, refund", (
     const a = await vendorBalances(db, vendors[0].id);
     expect(a.pending).toBe(10_000_000n - 1_000_000n + 150_000n); // spec example: ₦100k − 10% + shipping
     expect(a.available).toBe(0n);
-    expect(await accountBalance(db, PlatformAccounts.commission.code)).toBe(1_000_000n + 500_000n);
-    expect(await accountBalance(db, PlatformAccounts.clearing.code)).toBe(order.totalMinor);
+    const capture = await db.ledgerTransaction.findFirstOrThrow({ where: { kind: "PAYMENT_CAPTURED", reference: order.number }, include: { entries: { include: { account: true } } } });
+    expect(capture.entries.find((e) => e.account.code === PlatformAccounts.commission.code)?.creditMinor).toBe(1_000_000n + 500_000n);
+    expect(capture.entries.find((e) => e.account.code === PlatformAccounts.clearing.code)?.debitMinor).toBe(order.totalMinor);
+    void accountBalance;
     await assertBooksBalance();
   });
 
@@ -151,7 +157,10 @@ describe("Workflows C–E: multi-vendor purchase, settlement, payout, refund", (
     expect((await db.vendorOrder.findUniqueOrThrow({ where: { id: voB.id } })).status).toBe("NEW");
   });
 
-  it("releases settlement after the hold period, once", async () => {
+  it("releases settlement after the hold period, once (customer-confirmed delivery)", async () => {
+    const voA = await db.vendorOrder.findFirstOrThrow({ where: { orderId, vendorId: vendors[0].id } });
+    expect(await releaseSettlements(new Date(Date.now() + 4 * 864e5), 3)).toBe(0); // vendor's own claim is not enough after 4 days
+    await confirmReceipt(customerId, voA.id);
     expect(await releaseSettlements(new Date(), 3)).toBe(0); // still within hold window
     expect(await releaseSettlements(new Date(Date.now() + 4 * 864e5), 3)).toBe(1);
     expect(await releaseSettlements(new Date(Date.now() + 4 * 864e5), 3)).toBe(0);
