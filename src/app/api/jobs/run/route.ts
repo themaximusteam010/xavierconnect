@@ -17,3 +17,6 @@ export async function POST(req: Request) {
   const settled = await releaseSettlements();
   return NextResponse.json({ expired, settled });
 }
+
+/** Vercel Cron sends GET with the same bearer secret. */
+export const GET = POST;
