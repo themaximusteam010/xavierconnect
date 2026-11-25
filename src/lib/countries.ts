@@ -16,3 +16,11 @@ export const SUPPORTED_CURRENCIES = ["NGN", "CNY", "USD", "EUR", "GBP", "GHS", "
 
 /** International phone format check (E.164-ish) for non-Nigerian vendors. */
 export const isIntlPhone = (s: string) => /^\+?[1-9]\d{6,14}$/.test(s.replace(/[\s()-]/g, ""));
+
+/**
+ * Whether a vendor delivery method can deliver to the destination country.
+ * Methods with no destinationCountries cover the vendor's own country only.
+ */
+export function methodServes(vendorCountry: string, m: { destinationCountries: string[] }, destination = "NG") {
+  return m.destinationCountries.length === 0 ? vendorCountry === destination : m.destinationCountries.includes(destination);
+}

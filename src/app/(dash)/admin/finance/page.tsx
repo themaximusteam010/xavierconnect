@@ -8,12 +8,22 @@ import { Table, Td, Th } from "@/components/ui/table";
 import { Input, Select } from "@/components/ui/form";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { formatMoney } from "@/lib/money";
+import Link from "next/link";
+import { ButtonLink } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
+import { FilterBar, qs } from "@/components/admin/filters";
+import { runReconciliationAction } from "@/app/actions/admin-ops";
 
 export const metadata = { title: "Finance" };
 
-export default async function Finance({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
+export default async function Finance({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string; tab?: string; q?: string; status?: string; page?: string }> }) {
   const u = await guard("finance.view");
   const sp = await searchParams;
+  const nav = (
+    <nav className="mb-6 flex gap-1 border-b border-line text-sm">{[["", "Overview"], ["ledger", "Ledger transactions"], ["reconciliation", "Reconciliation"]].map(([k, l]) => <Link key={k} href={k ? `/admin/finance?tab=${k}` : "/admin/finance"} className={`-mb-px border-b-2 px-3 py-2 ${(sp.tab ?? "") === k ? "border-ink font-medium" : "border-transparent text-ink-muted hover:text-ink"}`}>{l}</Link>)}</nav>
+  );
+  if (sp.tab === "ledger") return <><PageHeader title="Finance" description="Ledger transactions are append-only. Corrections are made with new reversing entries, never by editing history." actions={<ButtonLink variant="secondary" href="/admin-export/ledger?range=90d">Export ledger (90 days)</ButtonLink>} />{nav}<LedgerTab sp={sp} /></>;
+  if (sp.tab === "reconciliation") return <><PageHeader title="Finance" description="Re-checks recent payments and payouts against the provider." actions={<form action={runReconciliationAction}><SubmitButton variant="secondary">Run reconciliation now</SubmitButton></form>} /><FlashFromQuery ok={sp.ok} error={sp.error} />{nav}<ReconTab sp={sp} /></>;
   const [tb, payouts, rules, cats, vendors, failedRefunds] = await Promise.all([
     trialBalance(),
     db.payout.findMany({ where: { status: { in: ["REQUESTED", "APPROVED", "PROCESSING"] } }, orderBy: { createdAt: "asc" }, include: { vendor: { include: { store: true, payoutAccount: true } } } }),
@@ -32,30 +42,13 @@ export default async function Finance({ searchParams }: { searchParams: Promise<
     <>
       <PageHeader title="Finance" description="All figures are derived from the double-entry ledger." actions={canPay && <form action={runSettlementAction}><SubmitButton variant="secondary">Run settlement now</SubmitButton></form>} />
       <FlashFromQuery ok={sp.ok} error={sp.error} />
+      {nav}
       {td !== tc && <Alert tone="danger" title="Ledger out of balance" className="mb-6">Debits {formatMoney(td)} ≠ credits {formatMoney(tc)}. Investigate immediately.</Alert>}
       {failedRefunds.length > 0 && <Alert tone="warning" title={`${failedRefunds.length} refund(s) need attention`} className="mb-6">{failedRefunds.map((r) => `${r.order.number} (${r.reason})`).join(", ")}</Alert>}
 
-      <section className="mb-10">
-        <h2 className="mb-3 font-semibold">Withdrawal requests</h2>
-        {payouts.length === 0 ? <p className="text-sm text-ink-muted">No pending requests.</p> : (
-          <Table><thead><tr><Th>Vendor</Th><Th>Requested</Th><Th>Bank</Th><Th className="text-right">Amount</Th><Th>Action</Th></tr></thead>
-            <tbody>{payouts.map((p) => (
-              <tr key={p.id}>
-                <Td className="font-medium text-ink">{p.vendor.store?.name ?? p.vendor.businessName}<StatusBadge status={p.status} /></Td>
-                <Td>{p.createdAt.toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" })}</Td>
-                <Td>{p.vendor.payoutAccount ? `${p.vendor.payoutAccount.bankName} ••••${p.vendor.payoutAccount.accountNumberLast4}` : <span className="text-danger">No account</span>}<span className="block text-[12px] text-ink-muted">{p.vendor.payoutAccount?.accountName}</span></Td>
-                <Td className="tabular text-right font-medium">{formatMoney(p.amountMinor)}</Td>
-                <Td>{canPay ? (
-                  <div className="space-y-2">
-                    <form action={payoutDecisionAction} className="flex gap-2"><input type="hidden" name="id" value={p.id} /><input type="hidden" name="op" value="paid" /><Input name="ref" placeholder="Transfer ref" className="h-8 w-32" required /><SubmitButton size="sm" confirm={`Confirm ${formatMoney(p.amountMinor)} has been transferred?`}>Mark paid</SubmitButton></form>
-                    <form action={payoutDecisionAction} className="flex gap-2"><input type="hidden" name="id" value={p.id} /><Input name="reason" placeholder="Reason" className="h-8 w-32" /><SubmitButton name="op" value="rejected" size="sm" variant="ghost">Reject</SubmitButton><SubmitButton name="op" value="failed" size="sm" variant="ghost">Failed</SubmitButton></form>
-                  </div>
-                ) : "—"}</Td>
-              </tr>
-            ))}</tbody>
-          </Table>
-        )}
-        <p className="mt-2 text-[12px] text-ink-muted">Automatic transfers via the payment provider's Transfers API are not enabled. Pay by bank transfer, then record the reference here.</p>
+      <section className="mb-10 rounded-lg border border-line bg-white p-4 text-sm">
+        <h2 className="mb-1 font-semibold">Withdrawal requests</h2>
+        <p className="text-ink-muted">{payouts.length} payout(s) awaiting action. Approve, send and reconcile them on the <Link href="/admin/payouts?status=REQUESTED" className="text-brand underline">Payouts</Link> page.</p>
       </section>
 
       <section className="mb-10 grid gap-6 2xl:grid-cols-2">
@@ -88,6 +81,52 @@ export default async function Finance({ searchParams }: { searchParams: Promise<
           )}
         </div>
       </section>
+    </>
+  );
+}
+
+async function LedgerTab({ sp }: { sp: { q?: string; page?: string } }) {
+  const page = Math.max(1, Number(sp.page) || 1);
+  const where = sp.q ? { OR: [{ reference: { contains: sp.q } }, { kind: { contains: sp.q.toUpperCase() } }] } : {};
+  const [txs, total] = await Promise.all([
+    db.ledgerTransaction.findMany({ where, orderBy: { createdAt: "desc" }, skip: (page - 1) * 30, take: 30, include: { entries: { include: { account: { select: { code: true } } } } } }),
+    db.ledgerTransaction.count({ where }),
+  ]);
+  return (
+    <>
+      <FilterBar action="/admin/finance" values={sp} fields={[{ type: "search", name: "q", placeholder: "Reference or kind (e.g. PAYOUT)" }]} extra={<input type="hidden" name="tab" value="ledger" />} />
+      <div className="space-y-3">{txs.map((t) => (
+        <div key={t.id} className="rounded-lg border border-line bg-white text-[13px]">
+          <p className="flex flex-wrap justify-between gap-2 border-b border-line px-4 py-2"><span><span className="font-medium">{t.kind}</span> · {t.reference} · {t.description}</span><span className="text-ink-muted">{t.createdAt.toLocaleString("en-NG")}</span></p>
+          <table className="w-full"><tbody>{t.entries.map((e) => <tr key={e.id}><td className="px-4 py-1 font-mono text-[12px]">{e.account.code}</td><td className="tabular px-4 py-1 text-right">{e.debitMinor ? formatMoney(e.debitMinor) : ""}</td><td className="tabular px-4 py-1 text-right">{e.creditMinor ? formatMoney(e.creditMinor) : ""}</td></tr>)}</tbody></table>
+        </div>
+      ))}</div>
+      <Pagination page={page} pages={Math.ceil(total / 30)} href={(n) => qs("/admin/finance", { ...sp, tab: "ledger", page: n })} />
+    </>
+  );
+}
+
+async function ReconTab({ sp }: { sp: { status?: string; page?: string } }) {
+  const page = Math.max(1, Number(sp.page) || 1);
+  const where = sp.status ? { status: sp.status } : {};
+  const [rows, total, summary] = await Promise.all([
+    db.reconciliationRecord.findMany({ where, orderBy: { runAt: "desc" }, skip: (page - 1) * 50, take: 50 }),
+    db.reconciliationRecord.count({ where }),
+    db.reconciliationRecord.groupBy({ by: ["status"], where: { runAt: { gte: new Date(Date.now() - 7 * 864e5) } }, _count: true }),
+  ]);
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap gap-2 text-[13px]">{summary.map((s) => <span key={s.status} className={`rounded-full border px-3 py-1 ${s.status === "MATCHED" ? "border-line" : "border-amber-300 bg-warning-soft"}`}>{s.status.toLowerCase().replace(/_/g, " ")}: {s._count} (7 days)</span>)}</div>
+      <FilterBar action="/admin/finance" values={sp} fields={[{ type: "select", name: "status", label: "Result", options: [["MATCHED", "Matched"], ["AMOUNT_MISMATCH", "Amount mismatch"], ["STATUS_MISMATCH", "Status mismatch"], ["MISSING_AT_PROVIDER", "Missing at provider"], ["UNVERIFIABLE", "Unverifiable (manual)"]] }]} extra={<input type="hidden" name="tab" value="reconciliation" />} />
+      <Table>
+        <thead><tr><Th>Checked</Th><Th>Provider</Th><Th>Kind</Th><Th>Reference</Th><Th className="text-right">Internal</Th><Th className="text-right">Provider</Th><Th>Result</Th></tr></thead>
+        <tbody>{rows.length === 0 ? <tr><Td colSpan={7} className="py-6 text-center text-ink-muted">No reconciliation results yet. The scheduled job runs daily.</Td></tr> : rows.map((r) => (
+          <tr key={r.id}><Td>{r.runAt.toLocaleString("en-NG", { dateStyle: "short", timeStyle: "short" })}</Td><Td>{r.providerKey}</Td><Td>{r.kind.toLowerCase()}</Td><Td className="font-mono text-[12px]">{r.reference}</Td>
+            <Td className="tabular text-right">{r.internalAmountMinor != null ? formatMoney(r.internalAmountMinor) : "—"}</Td><Td className="tabular text-right">{r.providerAmountMinor != null ? formatMoney(r.providerAmountMinor) : "—"}</Td>
+            <Td><span className={r.status === "MATCHED" ? "text-success" : r.status === "UNVERIFIABLE" ? "text-ink-muted" : "text-danger"}>{r.status.toLowerCase().replace(/_/g, " ")}</span>{r.detail && <span className="block text-[11px] text-ink-muted">{r.detail}</span>}</Td></tr>
+        ))}</tbody>
+      </Table>
+      <Pagination page={page} pages={Math.ceil(total / 50)} href={(n) => qs("/admin/finance", { ...sp, tab: "reconciliation", page: n })} />
     </>
   );
 }

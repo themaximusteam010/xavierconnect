@@ -145,7 +145,7 @@ export async function markPayoutPaid(payoutId: string, actorId: string | null, p
     });
     await tx.payoutEvent.create({ data: { payoutId: p.id, status: "PAID", message: opts.providerConfirmed ? `Provider confirmed (${providerRef})` : `Bank reference recorded (${providerRef})` } });
     await audit(tx, { actorId, action: "payout.paid", entityType: "Payout", entityId: p.id, before: { status: p.status }, after: { status: "PAID", providerRef } });
-    await notify(tx, { userId: p.vendor.ownerId, type: "payout.update", title: "Withdrawal paid", body: `Your withdrawal has been transferred. Reference ${providerRef}.`, link: "/vendor/earnings" });
+    await notify(tx, { userId: p.vendor.ownerId, type: "payout.update", title: "Withdrawal paid", body: `Your withdrawal has been transferred. Reference ${providerRef}.`, link: "/vendor/payouts" });
     return updated;
   });
 }
@@ -169,7 +169,7 @@ export async function failPayout(payoutId: string, actorId: string | null, reaso
     const updated = await tx.payout.update({ where: { id: p.id }, data: { status, failureReason: reason, ...(actorId ? { reviewedById: actorId, reviewedAt: new Date() } : {}) } });
     await tx.payoutEvent.create({ data: { payoutId: p.id, status, message: reason } });
     await audit(tx, { actorId, action: `payout.${status.toLowerCase()}`, entityType: "Payout", entityId: p.id, before: { status: p.status }, after: { status, reason } });
-    await notify(tx, { userId: p.vendor.ownerId, type: "payout.update", title: "Withdrawal not completed", body: `${reason}. The amount is back in your available balance.`, link: "/vendor/earnings" });
+    await notify(tx, { userId: p.vendor.ownerId, type: "payout.update", title: "Withdrawal not completed", body: `${reason}. The amount is back in your available balance.`, link: "/vendor/payouts" });
     return updated;
   });
 }

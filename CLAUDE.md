@@ -16,6 +16,11 @@ Multi-vendor marketplace for Xavier Enterprise. Next.js 15 (App Router, server a
 - **Authorisation:** admin pages call `guard(permission)`; admin actions call `requirePermission(permission)`. Permissions live in `src/server/auth/rbac.ts`; `prisma/rbac-sync.ts` mirrors them to the DB.
 - **Payments:** never trust redirects or webhooks; `confirmPayment()` re-verifies with the provider and checks amount + currency. Sandbox provider is refused in production unless `ALLOW_SANDBOX_PAYMENTS=true`.
 - Paid digital files and KYC documents live under `storage/private/` and are only served by `/download/[grantId]` and `/admin-docs/[id]`.
+- **Payouts**: only provider confirmation (webhook/status) marks an API payout PAID; manual payouts need a bank reference. Corridors gate payouts; never enable LIVE without `complianceApproved`. Never invent provider endpoints — unverified adapters stay NOT_IMPLEMENTED / AWAITING_PARTNERSHIP (see `docs/INTEGRATIONS_AND_PARTNERSHIPS.md`).
+- **Settlement** needs delivery evidence (`STRONG_EVIDENCE` in `finance.ts`); vendor claims wait longer; open disputes block release.
+- **Secrets**: provider credentials and bank details are encrypted with `encryptJson` (`ENCRYPTION_KEY`); never return them to the browser.
+- **FX** uses bigint scaled rates (`src/server/domain/fx.ts`), rounding down. No floats.
+- Staff pages need MFA (`ADMIN_MFA_REQUIRED`, default on). Seeds create rows but never overwrite existing ones.
 - No fabricated data: no fake reviews, ratings, sales counts or testimonials. Demo seed data is labelled "(Demo)".
 
 ## Conventions

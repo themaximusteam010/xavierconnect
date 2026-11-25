@@ -2,7 +2,12 @@
 
 - [ ] Paystack live + test keys configured; full purchase, refund and webhook tested against Paystack test mode
 - [ ] `PAYMENT_PROVIDER=paystack`, `ALLOW_SANDBOX_PAYMENTS` unset in production
-- [ ] Payout bank verification via Paystack implemented and tested
+- [ ] Paystack transfers tested in test mode (recipient, transfer, webhook success/failed/reversed); NG/NGN Paystack corridor set LIVE only after compliance sign-off
+- [ ] Manual-transfer maker/checker procedure written; finance staff enrolled in MFA
+- [ ] `ENCRYPTION_KEY` generated, stored in a secrets manager, set in Vercel; `OPS_ALERT_EMAIL` set
+- [ ] Review and apply migration `20261126090000_international_operations` (additive) to production
+- [ ] Update the live Vendor Agreement CMS page (seed text is not re-applied to existing pages)
+- [ ] Cross-border corridors stay DISABLED until partners and approvals in `docs/REGULATORY_CORRIDORS.md` are in place
 - [ ] Email sender (SMTP/Resend) worker implemented; SPF/DKIM/DMARC on sending domain
 - [ ] Staff MFA enabled; super admin password rotated from seed value
 - [ ] CSP header, Redis rate limiting, bot protection on register/checkout

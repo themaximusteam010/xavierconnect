@@ -36,7 +36,7 @@ export async function SiteHeader() {
     <header className="border-b border-line bg-white">
       <div className="bg-ink text-[12px] text-white/85">
         <div className="container-x flex h-8 items-center justify-between">
-          <p className="truncate">Buy from independent Nigerian businesses.<span className="hidden sm:inline"> Pay once, every seller is paid separately.</span></p>
+          <p className="truncate">Buy from independent businesses.<span className="hidden sm:inline"> Pay once, every seller is paid separately.</span></p>
           <div className="hidden gap-5 sm:flex">
             <Link href="/help" className="hover:text-white">Help Centre</Link>
             <Link href="/sell" className="hover:text-white">Sell on XavierConnect</Link>

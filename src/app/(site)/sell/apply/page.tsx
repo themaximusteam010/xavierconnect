@@ -12,7 +12,9 @@ import { ResendVerification } from "@/components/auth-forms";
 import { minorToInput } from "@/lib/money";
 import { NIGERIAN_STATES } from "@/lib/validation";
 import { cn } from "@/lib/cn";
-import { BANKS } from "@/lib/banks";
+import { VENDOR_COUNTRIES, countryName } from "@/lib/countries";
+import { adapterName, beneficiaryProvidersFor } from "@/server/services/payouts";
+import { BeneficiaryForm } from "@/components/beneficiary-form";
 
 export const metadata = { title: "Seller application", robots: { index: false } };
 
@@ -23,13 +25,16 @@ export default async function Apply({ searchParams }: { searchParams: Promise<{ 
   const row = await db.user.findUniqueOrThrow({ where: { id: user.id } });
   const v = await getApplication(user.id);
   const service = v?.type === "SERVICE_PROVIDER";
+  const payoutProviders = v ? await beneficiaryProvidersFor(v.country, v.payoutCurrency) : [];
+  const payoutDone = !!v && (v.beneficiaries.length > 0 || !!v.payoutAccount || (payoutProviders.length === 0 && v.onboardingStep >= 7));
+  const ng = (v?.country ?? "NG") === "NG";
   const steps = [
     { n: 1, label: "Account", done: !!row.emailVerifiedAt },
     { n: 2, label: "Seller type", done: !!v },
-    { n: 3, label: "Business", done: !!v?.addressLine1 && !!v?.description },
+    { n: 3, label: "Business", done: !!v?.addressLine1 && !!v?.description && !!(v?.state || v?.region) },
     { n: 4, label: "Verification", done: (v?.documents.length ?? 0) > 0 },
     { n: 5, label: "Storefront", done: !!v?.store },
-    { n: 6, label: "Payouts", done: !!v?.payoutAccount },
+    { n: 6, label: "Payouts", done: payoutDone },
     ...(!service ? [{ n: 7, label: "Delivery", done: (v?.shippingMethods.length ?? 0) > 0 }] : []),
     { n: 8, label: "Review & submit", done: !!v?.submittedAt },
   ];
@@ -85,19 +90,23 @@ export default async function Apply({ searchParams }: { searchParams: Promise<{ 
             <form action={saveBusinessAction} className="space-y-4">
               <h2 className="text-lg font-semibold">About your business</h2>
               <Field label={v.type === "BUSINESS" ? "Registered business name" : "Business or trading name"} htmlFor="businessName" required><Input id="businessName" name="businessName" defaultValue={v.businessName} /></Field>
-              {v.type === "BUSINESS" && <Field label="CAC RC / BN number" htmlFor="rcNumber" required><Input id="rcNumber" name="rcNumber" defaultValue={v.rcNumber ?? ""} /></Field>}
+              <Field label="Country of registration" htmlFor="country" required hint="Where your business is based. This decides how you are paid; it can't be changed after approval without a new review.">
+                <Select id="country" name="country" defaultValue={v.country}>{VENDOR_COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}</Select>
+              </Field>
+              {v.type === "BUSINESS" && <Field label={ng ? "CAC RC / BN number" : "Company registration number"} htmlFor="rcNumber" required><Input id="rcNumber" name="rcNumber" defaultValue={v.rcNumber ?? ""} /></Field>}
               <Field label="What do you sell?" htmlFor="description" required hint="At least 30 characters. Buyers won't see this; it helps our review."><Textarea id="description" name="description" defaultValue={v.description ?? ""} /></Field>
               <Field label="Main category" htmlFor="businessCategory" required><Input id="businessCategory" name="businessCategory" defaultValue={v.businessCategory ?? ""} placeholder="e.g. Fashion, Electronics, Photography" /></Field>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Business email" htmlFor="email" required><Input id="email" name="email" type="email" defaultValue={v.email} /></Field>
-                <Field label="Business phone" htmlFor="phone" required><Input id="phone" name="phone" type="tel" defaultValue={v.phone} /></Field>
+                <Field label="Business phone" htmlFor="phone" required hint={ng ? undefined : "Include the country code, e.g. +86…"}><Input id="phone" name="phone" type="tel" defaultValue={v.phone} /></Field>
                 <Field label="Website" htmlFor="website"><Input id="website" name="website" type="url" defaultValue={v.website ?? ""} placeholder="https://" /></Field>
                 <Field label="Instagram handle" htmlFor="instagram"><Input id="instagram" name="instagram" defaultValue={(v.socialLinks as { instagram?: string } | null)?.instagram ?? ""} placeholder="@yourbrand" /></Field>
               </div>
               <Field label="Business address" htmlFor="addressLine1" required><Input id="addressLine1" name="addressLine1" defaultValue={v.addressLine1 ?? ""} /></Field>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="City" htmlFor="city" required><Input id="city" name="city" defaultValue={v.city ?? ""} /></Field>
-                <Field label="State" htmlFor="state" required><Select id="state" name="state" defaultValue={v.state ?? ""}><option value="">Choose</option>{NIGERIAN_STATES.map((s) => <option key={s}>{s}</option>)}</Select></Field>
+                <Field label="State (Nigeria)" htmlFor="state" hint="For businesses in Nigeria."><Select id="state" name="state" defaultValue={v.state ?? ""}><option value="">Choose</option>{NIGERIAN_STATES.map((s) => <option key={s}>{s}</option>)}</Select></Field>
+                <Field label="Province / state / region (outside Nigeria)" htmlFor="region" hint="For businesses outside Nigeria."><Input id="region" name="region" defaultValue={v.region ?? ""} /></Field>
               </div>
               <SubmitButton disabled={!!locked}>Save and continue</SubmitButton>
             </form>
@@ -132,17 +141,15 @@ export default async function Apply({ searchParams }: { searchParams: Promise<{ 
           )}
 
           {step === 6 && v && (
-            <form action={savePayoutAction} className="space-y-4">
+            <div className="space-y-4">
               <h2 className="text-lg font-semibold">Where should we pay you?</h2>
-              <p className="text-sm text-ink-muted">Use a Nigerian bank account in your name{v.type === "BUSINESS" ? " or your business's name" : ""}. We only keep the last four digits; the full number is held by our payment provider.</p>
-              {v.payoutAccount && <Alert tone="success">Current: {v.payoutAccount.bankName} ••••{v.payoutAccount.accountNumberLast4} ({v.payoutAccount.accountName})</Alert>}
-              <Field label="Bank" htmlFor="bankCode" required>
-                <Select id="bankCode" name="bankCode" defaultValue={v.payoutAccount?.bankCode ?? ""}><option value="">Choose your bank</option>{BANKS.map(([n, c]) => <option key={c} value={c}>{n}</option>)}</Select>
-              </Field>
-              <Field label="Account number" htmlFor="accountNumber" required><Input id="accountNumber" name="accountNumber" inputMode="numeric" maxLength={10} pattern="\d{10}" /></Field>
-              <Field label="Account name" htmlFor="accountName" required hint="Exactly as it appears on your bank statement."><Input id="accountName" name="accountName" defaultValue={v.payoutAccount?.accountName ?? ""} /></Field>
-              <SubmitButton>Save payout account</SubmitButton>
-            </form>
+              <p className="text-sm text-ink-muted">A bank account in {countryName(v.country)} in your name{v.type === "BUSINESS" ? " or your business's name" : ""}, paid in {v.payoutCurrency}. We never ask for online-banking passwords, PINs or one-time codes.</p>
+              {v.beneficiaries.map((b) => <Alert key={b.id} tone={b.status === "VERIFIED" ? "success" : b.status === "REJECTED" ? "danger" : "info"}>{b.bankName} ••••{b.accountLast4} via {adapterName(b.providerKey)} — {b.status === "VERIFIED" ? "verified" : b.status === "REJECTED" ? `not verified: ${b.failureReason ?? ""}` : "verification in progress"}</Alert>)}
+              {v.payoutAccount && v.beneficiaries.length === 0 && <Alert>Earlier account on file: {v.payoutAccount.bankName} ••••{v.payoutAccount.accountNumberLast4}. Please add it again below so it can be verified.</Alert>}
+              <BeneficiaryForm vendor={v} providers={payoutProviders} action={savePayoutAction} submitLabel={v.beneficiaries.length ? "Add another account" : "Save payout account"} />
+              {payoutProviders.length === 0 && <form action={savePayoutAction}><input type="hidden" name="skip" value="1" /><SubmitButton variant="secondary" disabled={!!locked}>Continue without a payout account</SubmitButton></form>}
+              {v.beneficiaries.length > 0 && <ButtonLink href={`/sell/apply?step=${service ? 8 : 7}`}>Continue</ButtonLink>}
+            </div>
           )}
 
           {step === 7 && v && !service && (
@@ -150,11 +157,12 @@ export default async function Apply({ searchParams }: { searchParams: Promise<{ 
               <h2 className="text-lg font-semibold">Delivery</h2>
               <p className="text-sm text-ink-muted">Set simple flat prices now; you can add weight-based rates and more zones later from your dashboard.</p>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label={`Within ${v.state ?? "your state"} (₦)`} htmlFor="localRate" hint="Leave blank if you don't offer it."><Input id="localRate" name="localRate" inputMode="decimal" defaultValue={minorToInput(v.shippingMethods.find((m) => m.states.length)?.rateMinor)} /></Field>
-                <Field label="Nationwide (₦)" htmlFor="nationalRate"><Input id="nationalRate" name="nationalRate" inputMode="decimal" defaultValue={minorToInput(v.shippingMethods.find((m) => m.type === "FLAT" && !m.states.length)?.rateMinor)} /></Field>
+                <Field label={ng ? `Within ${v.state ?? "your state"} (₦)` : `Within ${countryName(v.country)} (₦)`} htmlFor="localRate" hint={ng ? "Leave blank if you don't offer it." : "Only if you also sell to buyers in your own country. Leave blank otherwise."}><Input id="localRate" name="localRate" inputMode="decimal" defaultValue={minorToInput(v.shippingMethods.find((m) => m.states.length)?.rateMinor)} /></Field>
+                <Field label={ng ? "Nationwide (₦)" : "Delivery to Nigeria (₦)"} htmlFor="nationalRate" hint={ng ? undefined : "Your all-in price to deliver to a buyer in Nigeria. Buyers are told import duties may apply."}><Input id="nationalRate" name="nationalRate" inputMode="decimal" defaultValue={minorToInput(v.shippingMethods.find((m) => m.type === "FLAT" && !m.states.length)?.rateMinor)} /></Field>
                 <Field label="Free delivery on orders over (₦)" htmlFor="freeOver" hint="Optional."><Input id="freeOver" name="freeOver" inputMode="decimal" /></Field>
               </div>
-              <Checkbox name="pickup" defaultChecked={v.shippingMethods.some((m) => m.type === "PICKUP")} label="Buyers can pick up from me" />
+              {!ng && <p className="text-[12px] text-ink-muted">You can add more international options and buy carrier labels from your dashboard after approval.</p>}
+              {ng && <Checkbox name="pickup" defaultChecked={v.shippingMethods.some((m) => m.type === "PICKUP")} label="Buyers can pick up from me" />}
               <SubmitButton disabled={!!locked}>Save and continue</SubmitButton>
             </form>
           )}

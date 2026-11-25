@@ -38,6 +38,41 @@ async function login(page, email, password) {
   await page.waitForURL((u) => !u.pathname.startsWith("/login"));
 }
 
+
+// RFC 6238 TOTP (SHA-1, 30 s, 6 digits) so the script can complete staff two-step verification.
+let adminTotpSecret = process.env.ADMIN_TOTP_SECRET || null;
+function totp(base32) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let bits = "";
+  for (const ch of base32.replace(/[\s=]/g, "").toUpperCase()) bits += alphabet.indexOf(ch).toString(2).padStart(5, "0");
+  const key = Buffer.from(bits.match(/.{8}/g).map((b) => parseInt(b, 2)));
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)));
+  const h = require("node:crypto").createHmac("sha1", key).update(counter).digest();
+  const o = h[h.length - 1] & 0xf;
+  return String((h.readUInt32BE(o) & 0x7fffffff) % 1_000_000).padStart(6, "0");
+}
+
+async function adminLogin(page) {
+  await login(page, process.env.ADMIN_EMAIL ?? "admin@xavierconnect.local", process.env.ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!");
+  await page.goto(`${BASE}/admin`);
+  if (!new URL(page.url()).pathname.startsWith("/mfa")) return;
+  const keyEl = page.locator("code.select-all");
+  if (await keyEl.count()) {
+    adminTotpSecret = (await keyEl.innerText()).replace(/\s/g, "");
+    await page.fill("#code", totp(adminTotpSecret));
+    await page.click('button[type="submit"]');
+    await page.getByText(/recovery code/i).first().waitFor();
+    step("staff MFA enrolled (TOTP)");
+  } else {
+    if (!adminTotpSecret) throw new Error("Admin already has MFA enrolled: set ADMIN_TOTP_SECRET to run the admin steps.");
+    await page.fill("#code", totp(adminTotpSecret));
+    await page.click('button[type="submit"]');
+    await page.waitForURL((u) => !u.pathname.startsWith("/mfa"));
+  }
+  await page.goto(`${BASE}/admin`);
+}
+
 (async () => {
   const browser = await chromium.launch();
   const page = await (await browser.newContext()).newPage();
@@ -59,13 +94,15 @@ async function login(page, email, password) {
   await page.setInputFiles("#file", IMG); await page.click('form:has(#file) button[type="submit"]'); await page.getByText("logo.png").waitFor();
   await page.goto(`${BASE}/sell/apply?step=5`);
   await page.fill("#name", `E2E Crafts ${run}`); await page.click('main button[type="submit"]'); await page.waitForURL(/step=6/);
-  await page.selectOption("#bankCode", "058"); await page.fill("#accountNumber", "0123456789"); await page.fill("#accountName", "E2E Vendor");
-  await page.click('main button[type="submit"]'); await page.waitForURL(/step=7/);
+  await page.fill('input[name="accountHolderName"]', "E2E Vendor"); await page.fill('input[name="bankName"]', "GTBank");
+  await page.fill('input[name="bankCode"]', "058"); await page.fill('input[name="accountNumber"]', "0123456789"); await page.check('input[name="confirm"]');
+  await page.click('form:has(input[name="accountNumber"]) button[type="submit"]'); await page.waitForURL(/step=7/);
+  step("A: payout account submitted (pending finance verification for manual transfers)");
   await page.fill("#localRate", "2000"); await page.fill("#nationalRate", "4500"); await page.click('main button[type="submit"]'); await page.waitForURL(/step=8/);
   await page.check('input[name="agree"]'); await page.click('main button[type="submit"]'); await page.waitForURL(/submitted=1/);
   step("A: application completed through all steps and submitted");
 
-  await login(page, process.env.ADMIN_EMAIL ?? "admin@xavierconnect.local", process.env.ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!");
+  await adminLogin(page);
   const vendor = await db.vendor.findFirstOrThrow({ where: { email: vEmail } });
   await page.goto(`${BASE}/admin/vendors/${vendor.id}`);
   page.once("dialog", (d) => d.accept());
@@ -90,7 +127,7 @@ async function login(page, email, password) {
   const res = await page.request.get(`${BASE}${product.images[0].url}`); assert.equal(res.status(), 200);
   step("B: uploaded image is served from storage");
 
-  await login(page, process.env.ADMIN_EMAIL ?? "admin@xavierconnect.local", process.env.ADMIN_PASSWORD ?? "ChangeMe-Admin-2026!");
+  await adminLogin(page);
   await page.goto(`${BASE}/admin/listings`);
   await page.locator(`li:has-text("E2E Leather Wallet ${run}") button[value="approve"]`).click();
   await page.getByText("Listing approved").waitFor();

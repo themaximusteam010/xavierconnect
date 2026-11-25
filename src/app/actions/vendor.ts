@@ -42,14 +42,14 @@ export async function vendorOrderStatusAction(fd: FormData) {
 export async function requestPayoutAction(fd: FormData) {
   const { vendorId, user } = await requireVendor("finance");
   const amount = parseNairaToMinor(String(fd.get("amount") ?? ""));
-  if (amount == null) to("/vendor/earnings", "error", "Enter an amount in naira.");
+  if (amount == null) to("/vendor/payouts", "error", "Enter an amount in naira.");
   try {
     await requestPayout(vendorId, amount!, user.id, String(fd.get("key") || randomUUID()));
   } catch (e) {
-    if (e instanceof FinanceError) to("/vendor/earnings", "error", e.message);
+    if (e instanceof FinanceError) to("/vendor/payouts", "error", e.message);
     throw e;
   }
-  to("/vendor/earnings", "ok", "Withdrawal requested. Finance reviews requests every business day.");
+  to("/vendor/payouts", "ok", "Withdrawal requested. Finance reviews requests every business day.");
 }
 
 export async function saveStoreSettingsAction(fd: FormData) {

@@ -21,13 +21,19 @@
 | CSV formula-injection guard on exports | `vendor-export/products` |
 | Security headers — X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy; `x-powered-by` off | `next.config.ts` |
 | Sandbox payments refused in production unless explicitly allowed | `payments/index.ts` |
+| Staff MFA — TOTP (RFC 6238, verified against RFC test vectors), per-session verification, hashed one-time recovery codes, admin reset audit-logged | `src/server/auth/totp.ts`, `actions/mfa.ts` |
+| Credential and bank-detail encryption — AES-256-GCM with `ENCRYPTION_KEY`; write-only credential fields; only 4-char hints shown | `src/server/crypto.ts`, provider cards |
+| Webhooks — one route per provider, signature verified, stored once (unique provider+event key), retried with backoff, dead-lettered with alert | `api/webhooks/[provider]`, `services/webhooks.ts` |
+| Payout integrity — provider-confirmed only; DB CHECK that PAID payouts have a reference; FX quote stored and re-checked with integer arithmetic | `services/payouts.ts`, migration |
+| Staff exports — permission + MFA checked, every export audit-logged, CSV formula-injection guard, money as exact decimals | `app/admin-export/[report]` |
+| Never ask for banking passwords/PINs/OTPs — stated on every bank-account form | `components/beneficiary-form.tsx` |
 
 ## Outstanding before launch
-1. **MFA for staff** (TOTP; `User.mfaSecret` column exists) — required by the brief, not yet built.
 2. **Distributed rate limiting** — current limiter is in-memory per process. Back with Redis for multi-instance deploys.
 3. **Content-Security-Policy** header (nonce-based) — not set yet.
 4. **Bot protection** on register/checkout (e.g. Cloudflare Turnstile).
-5. **Payout bank verification** via Paystack `/bank/resolve` + transfer recipients — currently sandbox-only; live mode refuses to save payout accounts.
+5. **ENCRYPTION_KEY management** — store in a secrets manager with a documented rotation procedure (re-encrypt `IntegrationProvider.credentialsEnc` and `Beneficiary.detailsEnc`).
+10. **Paystack transfers** tested end-to-end in test mode before enabling the NG/NGN Paystack corridor.
 6. **Malware scanning** of uploaded digital files and KYC documents.
 7. **Backups**: daily PostgreSQL base backup + WAL archiving (or managed DB PITR), and nightly sync of `storage/private`. Test restores monthly.
 8. **Error monitoring** (e.g. Sentry) and log retention.

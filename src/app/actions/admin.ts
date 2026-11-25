@@ -83,25 +83,25 @@ export async function payoutDecisionAction(fd: FormData) {
   try {
     if (op === "paid") {
       const ref = String(fd.get("ref") ?? "").trim();
-      if (ref.length < 4) to("/admin/finance", "error", "Enter the bank transfer reference.");
+      if (ref.length < 4) to(`/admin/payouts?id=${id}`, "error", "Enter the bank transfer reference.");
       await markPayoutPaid(id, u.id, ref);
     } else {
       const reason = String(fd.get("reason") ?? "").trim() || "Rejected by finance";
       await failPayout(id, u.id, reason, op === "failed" ? "FAILED" : "REJECTED");
     }
   } catch (e) {
-    if (e instanceof FinanceError) to("/admin/finance", "error", e.message);
+    if (e instanceof FinanceError) to(`/admin/payouts?id=${id}`, "error", e.message);
     throw e;
   }
   revalidatePath("/admin", "layout");
-  to("/admin/finance", "ok", "Payout updated.");
+  to(`/admin/payouts?id=${id}`, "ok", "Payout updated.");
 }
 
 export async function runSettlementAction() {
   const u = await requirePermission("finance.payout.approve");
   const n = await releaseSettlements();
   await audit(db, { actorId: u.id, action: "settlement.run", entityType: "System", entityId: "settlement", after: { released: n } });
-  to("/admin/finance", "ok", `${n} vendor order(s) settled.`);
+  to("/admin/settlements", "ok", `${n} vendor order(s) settled.`);
 }
 
 export async function refundAction(fd: FormData) {
@@ -181,19 +181,19 @@ export async function toggleSectionAction(fd: FormData) {
   if (op === "save") await db.homepageSection.update({ where: { id }, data: { title: String(fd.get("title") ?? "") || null, subtitle: String(fd.get("subtitle") ?? "") || null } });
   await audit(db, { actorId: u.id, action: `cms.section.${op}`, entityType: "HomepageSection", entityId: id });
   revalidatePath("/");
-  revalidatePath("/admin/content");
+  revalidatePath("/admin/cms");
 }
 
 export async function saveBannerAction(fd: FormData) {
   const u = await requirePermission("cms.manage");
   const parsed = z.object({ id: z.string().optional(), placement: z.string().min(2), eyebrow: z.string().max(40).optional(), title: z.string().min(3).max(120), body: z.string().max(300).optional(), ctaLabel: z.string().max(40).optional(), ctaHref: z.string().max(200).regex(/^\/[^/]/, "Links must be internal paths starting with /").optional().or(z.literal("")), tone: z.enum(["blue", "charcoal", "light"]) }).safeParse(Object.fromEntries(fd));
-  if (!parsed.success) to("/admin/content", "error", parsed.error.issues[0].message);
+  if (!parsed.success) to("/admin/cms", "error", parsed.error.issues[0].message);
   const { id, ...d } = parsed.data!;
   const data = { ...d, eyebrow: d.eyebrow || null, body: d.body || null, ctaLabel: d.ctaLabel || null, ctaHref: d.ctaHref || null };
   const b = id ? await db.banner.update({ where: { id }, data }) : await db.banner.create({ data });
   await audit(db, { actorId: u.id, action: id ? "cms.banner.update" : "cms.banner.create", entityType: "Banner", entityId: b.id });
   revalidatePath("/");
-  to("/admin/content", "ok", "Banner saved.");
+  to("/admin/cms", "ok", "Banner saved.");
 }
 
 export async function toggleBannerAction(fd: FormData) {
@@ -201,7 +201,7 @@ export async function toggleBannerAction(fd: FormData) {
   const b = await db.banner.findUniqueOrThrow({ where: { id: String(fd.get("id")) } });
   await db.banner.update({ where: { id: b.id }, data: { active: !b.active } });
   revalidatePath("/");
-  revalidatePath("/admin/content");
+  revalidatePath("/admin/cms");
 }
 
 export async function saveCommissionRuleAction(fd: FormData) {

@@ -11,9 +11,10 @@ export default async function VendorLayout({ children }: { children: React.React
   const vendorId = u.vendorIds[0];
   if (!vendorId) redirect("/sell/apply");
   const vendor = await db.vendor.findUniqueOrThrow({ where: { id: vendorId }, include: { store: true } });
-  const [newOrders, pendingBookings] = await Promise.all([
+  const [newOrders, pendingBookings, failedPayouts] = await Promise.all([
     db.vendorOrder.count({ where: { vendorId, status: "NEW" } }),
     db.booking.count({ where: { vendorId, status: "REQUESTED" } }),
+    db.payout.count({ where: { vendorId, status: "FAILED", updatedAt: { gte: new Date(Date.now() - 7 * 864e5) } } }),
   ]);
   const can = (c: Parameters<typeof hasVendorCapability>[2]) => hasVendorCapability(u.grants, vendorId, c);
   const nav = [
@@ -22,7 +23,14 @@ export default async function VendorLayout({ children }: { children: React.React
     can("orders") && { href: "/vendor/orders", label: "Orders", badge: newOrders },
     can("services") && { href: "/vendor/services", label: "Services" },
     can("services") && { href: "/vendor/bookings", label: "Bookings", badge: pendingBookings },
-    can("finance") && { href: "/vendor/earnings", label: "Earnings" },
+    can("orders") && { href: "/vendor/shipments", label: "Shipments" },
+    can("finance") && { href: "/vendor/finance", label: "Finance" },
+    can("finance") && { href: "/vendor/payouts", label: "Payouts", badge: failedPayouts },
+    can("finance") && { href: "/vendor/settlements", label: "Settlements" },
+    can("finance") && { href: "/vendor/transactions", label: "Transactions" },
+    can("finance") && { href: "/vendor/bank-accounts", label: "Bank accounts" },
+    can("finance") && { href: "/vendor/payments", label: "Payments" },
+    can("settings") && { href: "/vendor/shipping", label: "Shipping" },
     can("catalog") && { href: "/vendor/marketing", label: "Coupons" },
     can("settings") && { href: "/vendor/settings", label: "Settings" },
   ].filter(Boolean) as { href: string; label: string; badge?: number }[];

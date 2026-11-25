@@ -22,7 +22,7 @@ export async function uniqueStoreSlug(name: string, excludeVendorId?: string) {
 }
 
 export async function getApplication(userId: string) {
-  return db.vendor.findFirst({ where: { ownerId: userId }, include: { store: true, documents: true, shippingMethods: true, payoutAccount: true } });
+  return db.vendor.findFirst({ where: { ownerId: userId }, include: { store: true, documents: true, shippingMethods: true, payoutAccount: true, beneficiaries: { where: { status: { not: "DISABLED" } }, orderBy: { createdAt: "desc" } } } });
 }
 
 export async function startApplication(userId: string, type: VendorType) {
@@ -45,7 +45,7 @@ export async function submitApplication(vendorId: string, userId: string) {
   assertEditable(v.status);
   const missing: string[] = [];
   if (!v.description || !v.businessCategory) missing.push("business details");
-  if (!v.addressLine1 || !v.city || !v.state) missing.push("business address");
+  if (!v.addressLine1 || !v.city || !(v.state || v.region)) missing.push("business address");
   if (!v.store) missing.push("storefront");
   if (v.documents.length === 0) missing.push("verification document");
   if (v.type !== "SERVICE_PROVIDER" && v.shippingMethods.length === 0) missing.push("delivery method");

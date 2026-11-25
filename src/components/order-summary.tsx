@@ -10,8 +10,9 @@ export const orderInclude = {
     include: {
       vendor: { include: { store: true } },
       items: { include: { product: { select: { slug: true } }, downloadGrants: { select: { id: true, expiresAt: true, downloadsUsed: true, maxDownloads: true, revokedAt: true, asset: { select: { fileName: true } } } } } },
-      shipments: { include: { events: { orderBy: { createdAt: "asc" } } } },
+      shipments: { include: { events: { orderBy: { createdAt: "asc" } }, customs: { select: { incoterm: true } } } },
       events: { orderBy: { createdAt: "asc" } },
+      disputes: { orderBy: { createdAt: "desc" }, include: { evidence: { orderBy: { createdAt: "asc" } } } },
     },
   },
 } satisfies Prisma.OrderInclude;
@@ -25,7 +26,7 @@ export function PaymentBanner({ outcome }: { outcome?: string }) {
   return null;
 }
 
-export function OrderDetail({ order, downloads = true }: { order: OrderFull; downloads?: boolean }) {
+export function OrderDetail({ order, downloads = true, renderActions }: { order: OrderFull; downloads?: boolean; renderActions?: (vo: OrderFull["vendorOrders"][number]) => React.ReactNode }) {
   const addr = order.shippingAddress as { fullName: string; phone: string; line1: string; line2?: string; city: string; state: string } | null;
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
@@ -53,10 +54,17 @@ export function OrderDetail({ order, downloads = true }: { order: OrderFull; dow
             </ul>
             {(vo.shipments.length > 0 || vo.events.length > 0) && (
               <ol className="space-y-1.5 border-t border-line px-4 py-3 text-[13px] text-ink-muted">
-                {vo.shipments.map((s) => s.trackingNumber && <li key={s.id}>Carrier {s.carrier} · Tracking <span className="font-medium text-ink">{s.trackingNumber}</span></li>)}
+                {vo.shipments.map((s) => (s.trackingNumber || s.international) && (
+                  <li key={s.id}>
+                    Carrier {s.carrier}{s.trackingNumber && <> · Tracking {s.trackingUrl ? <a href={s.trackingUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand underline">{s.trackingNumber}</a> : <span className="font-medium text-ink">{s.trackingNumber}</span>}</>}
+                    {s.international && <span className="mt-1 block rounded bg-warning-soft px-2 py-1 text-warning">International shipment{s.originCountry ? ` from ${s.originCountry}` : ""}. {s.customs?.incoterm === "DDP" ? "Import duties have been prepaid by the seller." : "Import duties and taxes may be charged by Nigeria Customs or the carrier on arrival."}</span>}
+                    {s.events.length > 1 && <span className="block">Latest: {s.events[s.events.length - 1].status.replace(/_/g, " ").toLowerCase()}{s.events[s.events.length - 1].location ? ` · ${s.events[s.events.length - 1].location}` : ""}</span>}
+                  </li>
+                ))}
                 {vo.events.map((e) => <li key={e.id}><span className="tabular">{e.createdAt.toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" })}</span> — {e.status.replace(/_/g, " ").toLowerCase()}{e.note ? `: ${e.note}` : ""}</li>)}
               </ol>
             )}
+            {renderActions?.(vo)}
           </section>
         ))}
       </div>

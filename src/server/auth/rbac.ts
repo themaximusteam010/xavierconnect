@@ -27,6 +27,8 @@ export const PERMISSIONS = {
   "audit.view": "View audit log",
   "settings.manage": "Change platform settings",
   "delivery.perform": "Update assigned deliveries",
+  "integrations.view": "View payment and shipping provider status and logs",
+  "integrations.manage": "Configure providers, credentials and payout corridors",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -47,7 +49,7 @@ export const ROLES: Record<string, { name: string; staff: boolean; vendorScoped?
   FINANCE_MANAGER: {
     name: "Finance Manager",
     staff: true,
-    permissions: ["admin.access", "finance.view", "finance.payout.approve", "finance.refund.approve", "commission.manage", "order.view_all", "vendor.view", "audit.view"],
+    permissions: ["admin.access", "finance.view", "finance.payout.approve", "finance.refund.approve", "commission.manage", "order.view_all", "vendor.view", "audit.view", "integrations.view", "dispute.decide"],
   },
   VENDOR_MANAGER: {
     name: "Vendor Manager",
@@ -57,7 +59,7 @@ export const ROLES: Record<string, { name: string; staff: boolean; vendorScoped?
   SUPPORT_AGENT: {
     name: "Customer Support Agent",
     staff: true,
-    permissions: ["admin.access", "support.view", "support.respond", "order.view_all", "user.view", "vendor.view"],
+    permissions: ["admin.access", "support.view", "support.respond", "order.view_all", "user.view", "vendor.view", "dispute.decide"],
   },
   CONTENT_MANAGER: { name: "Content Manager", staff: true, permissions: ["admin.access", "cms.manage"] },
   CUSTOMER: { name: "Customer", staff: false, permissions: [] },

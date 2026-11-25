@@ -1,3 +1,4 @@
+import { countryName, methodServes } from "@/lib/countries";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -62,7 +63,8 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
   const digital = p.type === "DIGITAL";
   const price = p.salePriceMinor != null && p.salePriceMinor < p.priceMinor ? p.salePriceMinor : p.priceMinor;
   const attrs = Object.entries((p.attributes ?? {}) as Record<string, string>).filter(([, v]) => v);
-  const ship = p.vendor.shippingMethods[0];
+  const ship = p.vendor.shippingMethods.find((m) => methodServes(p.vendor.country, m, "NG"));
+  const abroad = p.vendor.country !== "NG";
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -127,10 +129,10 @@ export default async function ProductPage({ params, searchParams }: { params: Pr
             {digital ? (
               <li className="flex gap-3"><ShieldCheck className="size-4 shrink-0 text-ink-muted" />Instant download after payment is confirmed. {p.digitalAssets[0] && `${p.digitalAssets[0].format.toUpperCase()}, ${(p.digitalAssets[0].sizeBytes / 1_048_576).toFixed(1)} MB, version ${p.digitalAssets[0].version}.`}</li>
             ) : (
-              <li className="flex gap-3"><Truck className="size-4 shrink-0 text-ink-muted" />{ship ? <>Ships from {store.city ?? store.state ?? "Nigeria"} · {ship.name}{ship.rateMinor > 0n ? ` from ${formatMoney(ship.rateMinor)}` : " (free)"} · {ship.etaDaysMin}–{ship.etaDaysMax} days</> : "Delivery options are confirmed at checkout."}</li>
+              <li className="flex gap-3"><Truck className="size-4 shrink-0 text-ink-muted" />{ship ? <>Ships from {abroad ? `${store.city ? `${store.city}, ` : ""}${countryName(p.vendor.country)}` : store.city ?? store.state ?? "Nigeria"} · {ship.name}{ship.rateMinor > 0n ? ` from ${formatMoney(ship.rateMinor)}` : " (free)"} · {ship.etaDaysMin}–{ship.etaDaysMax} days{abroad && <span className="block text-[12px] text-warning">International shipment — import duties and taxes may apply on arrival.</span>}</> : "Delivery options are confirmed at checkout."}</li>
             )}
             <li className="flex gap-3"><RotateCcw className="size-4 shrink-0 text-ink-muted" />{p.returnInfo ?? (p.refundable ? "Returns accepted within 7 days of delivery for items not as described." : "This item is not eligible for return.")}</li>
-            <li className="flex gap-3"><ShieldCheck className="size-4 shrink-0 text-ink-muted" />The seller is paid only after delivery is confirmed.</li>
+            <li className="flex gap-3"><ShieldCheck className="size-4 shrink-0 text-ink-muted" />The seller&apos;s earnings are released only after delivery and a review period. Report a problem before then and we pause them.</li>
           </ul>
 
           <div className="mt-6 flex items-center justify-between rounded-lg bg-canvas p-4">

@@ -35,7 +35,7 @@ export default async function VendorHome() {
       {vendor.status !== "APPROVED" && <Alert tone="info" className="mb-6" title="Your application isn't approved yet">You can prepare listings, but buyers can't see them until approval. <Link href="/sell/apply" className="underline">View application</Link></Alert>}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Sales (30 days)" value={formatMoney(paid30._sum.totalMinor ?? 0n)} hint={`${paid30._count} orders`} />
-        {bal ? <Stat label="Available to withdraw" value={formatMoney(bal.available)} hint={<Link href="/vendor/earnings" className="text-brand">Earnings →</Link>} /> : <Stat label="Orders to process" value={count("NEW") + count("PROCESSING")} />}
+        {bal ? <Stat label="Available to withdraw" value={formatMoney(bal.available)} hint={<Link href="/vendor/payouts" className="text-brand">Earnings →</Link>} /> : <Stat label="Orders to process" value={count("NEW") + count("PROCESSING")} />}
         {bal ? <Stat label="Pending earnings" value={formatMoney(bal.pending)} hint="Released after delivery + hold period" /> : <Stat label="Ready to ship" value={count("READY_FOR_DISPATCH")} />}
         <Stat label="Conversion" value={conversion ? `${conversion}%` : "—"} hint={`${views.toLocaleString()} product views · ${visits.toLocaleString()} store visits`} />
       </div>

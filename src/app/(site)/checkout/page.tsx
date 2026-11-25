@@ -1,3 +1,4 @@
+import { countryName } from "@/lib/countries";
 import { redirect } from "next/navigation";
 import { db } from "@/server/db";
 import { getCurrentUser } from "@/server/auth/session";
@@ -55,6 +56,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                     </AutoSubmitSelect>
                   </div>
                 )}
+                {v.lines.some((l) => l.kind === "PHYSICAL") && view.vendorOrigin[v.vendorId] && view.vendorOrigin[v.vendorId] !== "NG" && <p className="rounded bg-warning-soft px-2 py-1 text-[12px] text-warning">Ships from {countryName(view.vendorOrigin[v.vendorId])}. Nigeria Customs import duties and taxes may be charged on arrival and are not included in this total unless the seller ships duties-paid.</p>}
+                {v.lines.some((l) => l.kind === "PHYSICAL") && (view.shippingOptions[v.vendorId]?.length ?? 0) === 0 && <p className="text-[12px] text-danger">This seller has no delivery option to Nigeria for these items.</p>}
                 {v.shippingMinor > 0n && <div className="tabular flex justify-between text-ink-muted"><span>Delivery fee</span><span>{formatMoney(v.shippingMinor)}</span></div>}
               </div>
             ))}

@@ -1,3 +1,4 @@
+import { methodServes } from "@/lib/countries";
 import type { DbClient } from "@/server/db";
 import { priceOrder, type CouponInput, type PricingLine, type ShippingMethodInput } from "@/server/domain/pricing";
 import type { CommissionRuleInput } from "@/server/domain/commission";
@@ -154,12 +155,16 @@ export async function loadCartView(db: DbClient, ident: CartIdent, shippingChoic
 
   const shippingByVendor: Record<string, ShippingMethodInput | null> = {};
   const shippingOptions: Record<string, { id: string; name: string; etaDaysMin: number; etaDaysMax: number }[]> = {};
+  const vendorOrigin: Record<string, string> = {};
   const vendorPlans: Record<string, string | null> = {};
   for (const i of valid) {
     const v = i.product.vendor;
     if (shippingOptions[v.id]) continue;
-    shippingOptions[v.id] = v.shippingMethods.map((m) => ({ id: m.id, name: m.name, etaDaysMin: m.etaDaysMin, etaDaysMax: m.etaDaysMax }));
-    const chosen = v.shippingMethods.find((m) => m.id === shippingChoice[v.id]) ?? v.shippingMethods[0] ?? null;
+    // Buyers are in Nigeria; only offer methods that actually deliver there.
+    const usable = v.shippingMethods.filter((m) => methodServes(v.country, m, "NG"));
+    vendorOrigin[v.id] = v.country;
+    shippingOptions[v.id] = usable.map((m) => ({ id: m.id, name: m.name, etaDaysMin: m.etaDaysMin, etaDaysMax: m.etaDaysMax }));
+    const chosen = usable.find((m) => m.id === shippingChoice[v.id]) ?? usable[0] ?? null;
     shippingByVendor[v.id] = chosen;
     vendorPlans[v.id] = v.subscription?.status === "ACTIVE" ? v.subscription.plan.key : null;
   }
@@ -173,7 +178,7 @@ export async function loadCartView(db: DbClient, ident: CartIdent, shippingChoic
     vendorPlans,
     taxBps: await getSetting(db, "taxBps"),
   });
-  return { cart, items: valid, pricing, shippingByVendor, shippingOptions, issues, couponCode: cart.couponCode, couponValid: !!coupon };
+  return { cart, items: valid, pricing, shippingByVendor, shippingOptions, vendorOrigin, issues, couponCode: cart.couponCode, couponValid: !!coupon };
 }
 
 export type CartView = NonNullable<Awaited<ReturnType<typeof loadCartView>>>;

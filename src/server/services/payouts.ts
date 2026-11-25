@@ -33,13 +33,24 @@ export async function corridorsFor(country: string) {
   return { all: rows, usable };
 }
 
+/** Payout providers a vendor in this country/currency can register a bank account with right now. */
+export async function beneficiaryProvidersFor(country: string, currency: string) {
+  const { usable } = await corridorsFor(country);
+  const keys = usable.filter((c) => c.currency === currency && paymentAdapter(c.providerKey)?.capabilities.includes("BENEFICIARY_ONBOARDING")).map((c) => c.providerKey);
+  if (country === "NG" && currency === "NGN") keys.push("manual");
+  return keys;
+}
+
 export async function addBeneficiary(vendorId: string, actorId: string, providerKey: string, input: BeneficiaryInput) {
   const vendor = await db.vendor.findUniqueOrThrow({ where: { id: vendorId } });
   if (input.country !== vendor.country) throw new FinanceError("Payout accounts must be in your country of registration.");
   const corridor = await resolveCorridor(db, input.country, input.currency, providerKey);
   void corridor;
-  let result;
-  try {
+  let result: { status: "VERIFIED" | "PENDING_VERIFICATION" | "REJECTED"; recipientRef?: string; verifiedName?: string; message?: string };
+  if (providerKey === "manual") {
+    // No provider API: details are held encrypted until a finance officer checks the account name with the bank.
+    result = { status: "PENDING_VERIFICATION", message: "Finance will confirm the account name with your bank before the first withdrawal." };
+  } else try {
     const { adapter, ctx } = await requirePayment(providerKey, "BENEFICIARY_ONBOARDING");
     result = await adapter.createBeneficiary!(ctx, input);
   } catch (e) {
@@ -64,6 +75,20 @@ export async function addBeneficiary(vendorId: string, actorId: string, provider
     return b;
   });
   return { beneficiary: ben, message: result.message };
+}
+
+/** Finance verification of a manually-paid account (name checked against the bank). Never used for provider-tokenised accounts. */
+export async function reviewManualBeneficiary(beneficiaryId: string, actorId: string, decision: "VERIFIED" | "REJECTED", note: string) {
+  const b = await db.beneficiary.findUnique({ where: { id: beneficiaryId } });
+  if (!b || b.providerKey !== "manual" || b.status !== "PENDING_VERIFICATION") throw new FinanceError("Only pending manual accounts can be reviewed here.");
+  if (decision === "REJECTED" && note.trim().length < 5) throw new FinanceError("Give the vendor a reason.");
+  await db.$transaction(async (tx) => {
+    const isFirst = decision === "VERIFIED" && (await tx.beneficiary.count({ where: { vendorId: b.vendorId, status: "VERIFIED", disabledAt: null } })) === 0;
+    await tx.beneficiary.update({ where: { id: b.id }, data: decision === "VERIFIED" ? { status: "VERIFIED", verifiedAt: new Date(), verifiedName: note.trim() || b.accountHolderName, isDefault: isFirst } : { status: "REJECTED", failureReason: note.trim() } });
+    await audit(tx, { actorId, action: `beneficiary.${decision.toLowerCase()}`, entityType: "Beneficiary", entityId: b.id, after: { note } });
+  });
+  const v = await db.vendor.findUniqueOrThrow({ where: { id: b.vendorId } });
+  await notify(db, { userId: v.ownerId, type: "payout.update", title: decision === "VERIFIED" ? "Bank account verified" : "Bank account not verified", body: decision === "VERIFIED" ? `${b.bankName} ••••${b.accountLast4} can now receive withdrawals.` : note, link: "/vendor/bank-accounts" });
 }
 
 export async function setDefaultBeneficiary(vendorId: string, beneficiaryId: string, actorId: string) {

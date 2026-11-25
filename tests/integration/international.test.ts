@@ -211,3 +211,22 @@ describe("Tests 3–12: purchase, shipping, settlement, payouts", () => {
     await booksBalance();
   });
 });
+
+describe("manual bank-transfer accounts", () => {
+  it("stay pending until finance verifies them, and only then become the default", async () => {
+    const { reviewManualBeneficiary } = await import("@/server/services/payouts");
+    const owner = await user("manual-vendor@intl.test");
+    const v = await db.vendor.create({ data: { ownerId: owner.id, type: "INDIVIDUAL", status: "APPROVED", businessName: "Manual Co", email: owner.email, phone: "08030000009", country: "NG" } });
+    const r = await addBeneficiary(v.id, owner.id, "manual", { country: "NG", currency: "NGN", routingType: "NUBAN", accountHolderName: "Manual Co", bankName: "GTBank", bankCode: "058", accountNumber: "0123456789" });
+    expect(r.beneficiary.status).toBe("PENDING_VERIFICATION");
+    expect(r.beneficiary.detailsEnc).toBeTruthy(); // encrypted, never plaintext
+    expect(r.beneficiary.detailsEnc).not.toContain("0123456789");
+    await expect(requestPayout(v.id, 1n, owner.id, "manual-k1")).rejects.toThrow(FinanceError);
+    await expect(reviewManualBeneficiary(r.beneficiary.id, adminId, "REJECTED", "")).rejects.toThrow(FinanceError);
+    await reviewManualBeneficiary(r.beneficiary.id, adminId, "VERIFIED", "MANUAL CO (confirmed by bank)");
+    const b = await db.beneficiary.findUniqueOrThrow({ where: { id: r.beneficiary.id } });
+    expect(b.status).toBe("VERIFIED");
+    expect(b.isDefault).toBe(true);
+    await expect(reviewManualBeneficiary(b.id, adminId, "VERIFIED", "again")).rejects.toThrow(FinanceError);
+  });
+});

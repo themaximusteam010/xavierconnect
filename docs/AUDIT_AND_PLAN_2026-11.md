@@ -106,3 +106,7 @@ Phase 5: disputes, reviews, reports, monitoring alerts, reconciliation, webhook 
 Phase 6: tests for acceptance scenarios 1–14 (sandbox providers where partners are not yet connected).
 
 Production database changes are **additive migrations only** and are not deployed until reviewed.
+
+## 7. Status at end of iteration
+
+All phases above are implemented and tested (61 unit/integration tests; browser workflows A–G including staff TOTP). Live partner connections remain outstanding — see `INTEGRATIONS_AND_PARTNERSHIPS.md` and `REGULATORY_CORRIDORS.md`.

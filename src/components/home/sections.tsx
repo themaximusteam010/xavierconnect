@@ -49,7 +49,7 @@ export async function Hero({ s }: { s: HomepageSection }) {
           </dl>
           <ul className="mt-6 space-y-3 text-[14px] leading-6 text-blue-50">
             <li><span className="font-semibold text-white">One checkout, many sellers.</span> Each seller ships and is paid for their part of your order.</li>
-            <li><span className="font-semibold text-white">Payment held until delivery.</span> Sellers are paid after your order arrives.</li>
+            <li><span className="font-semibold text-white">Sellers are paid after delivery.</span> We release a seller&apos;s earnings only after delivery and a short review period, and pause them if you report a problem.</li>
             <li><span className="font-semibold text-white">Verified sellers are marked.</span> We only show a badge after we check documents.</li>
           </ul>
         </div>
@@ -190,7 +190,7 @@ export function HowItWorks({ s }: { s: HomepageSection }) {
   const steps = [
     ["Find it", "Search across products, services and digital goods, or browse stores near you. Filter by price, rating, location and stock."],
     ["Pay once", "Check out items from several sellers in a single payment. Your money is held by our payment partner, not sent straight to the seller."],
-    ["Receive and review", "Each seller ships their part and you track every shipment. Sellers are paid after delivery, and you can raise a dispute if something is wrong."],
+    ["Receive and review", "Each seller ships their part and you track every shipment. Confirm receipt when it arrives, or report a problem — a seller’s earnings are released only after delivery and a review period."],
   ];
   return (
     <section className="container-x py-14">

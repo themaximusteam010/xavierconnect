@@ -5,7 +5,8 @@ import { allowedNextStatuses } from "@/server/services/orders";
 import { vendorOrderStatusAction } from "@/app/actions/vendor";
 import { PageHeader } from "@/components/ui/page-header";
 import { FlashFromQuery, StatusBadge } from "@/components/ui/feedback";
-import { Input } from "@/components/ui/form";
+import { Input, Textarea } from "@/components/ui/form";
+import { vendorDisputeReplyAction } from "@/app/actions/disputes";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { formatMoney } from "@/lib/money";
 
@@ -18,7 +19,7 @@ export default async function VendorOrder({ params, searchParams }: { params: Pr
   // Tenant boundary: vendorId in the where clause. Another vendor's id returns 404.
   const vo = await db.vendorOrder.findFirst({
     where: { id, vendorId },
-    include: { items: { include: { product: { select: { slug: true } } } }, order: { select: { number: true, shippingAddress: true, contactPhone: true, guestEmail: true, user: { select: { name: true } } } }, events: { orderBy: { createdAt: "asc" } }, shipments: true },
+    include: { items: { include: { product: { select: { slug: true } } } }, order: { select: { number: true, shippingAddress: true, contactPhone: true, guestEmail: true, user: { select: { name: true } } } }, events: { orderBy: { createdAt: "asc" } }, shipments: true, disputes: { orderBy: { createdAt: "desc" }, include: { evidence: { orderBy: { createdAt: "asc" } } } } },
   });
   if (!vo) notFound();
   const a = vo.order.shippingAddress as { fullName: string; phone: string; line1: string; line2?: string; city: string; state: string } | null;
@@ -31,6 +32,17 @@ export default async function VendorOrder({ params, searchParams }: { params: Pr
     <>
       <PageHeader eyebrow="Order" title={vo.number} description={<span className="flex items-center gap-2"><StatusBadge status={vo.status} /> Placed {vo.createdAt.toLocaleString("en-NG", { dateStyle: "long", timeStyle: "short" })}</span>} />
       <FlashFromQuery ok={sp.ok} error={sp.error} />
+      {vo.disputes.map((d) => (
+        <section key={d.id} className={`mb-6 rounded-lg border p-4 text-sm ${["OPEN", "AWAITING_VENDOR", "UNDER_REVIEW"].includes(d.status) ? "border-amber-300 bg-warning-soft" : "border-line bg-white"}`}>
+          <p className="font-semibold">Dispute: {d.reason} <StatusBadge status={d.status} /></p>
+          {d.status === "AWAITING_VENDOR" && <p className="text-warning">Respond within 3 days of {d.createdAt.toLocaleDateString("en-NG")}. Your earnings for this order are on hold until the dispute is decided.</p>}
+          <ol className="mt-2 space-y-1.5">{d.evidence.map((e) => <li key={e.id}><span className="text-ink-muted">{e.party === "VENDOR" ? "You" : e.party === "CUSTOMER" ? "Buyer" : "XavierConnect"} · {e.createdAt.toLocaleDateString("en-NG")}:</span> <span className="whitespace-pre-line">{e.body}</span></li>)}</ol>
+          {d.resolution && <p className="mt-2"><span className="font-medium">Decision:</span> {d.resolution}</p>}
+          {["OPEN", "AWAITING_VENDOR", "UNDER_REVIEW"].includes(d.status) && (
+            <form action={vendorDisputeReplyAction} className="mt-3 space-y-2"><input type="hidden" name="disputeId" value={d.id} /><Textarea name="body" rows={3} required minLength={5} placeholder="Your response: dispatch date, courier and tracking, proof of delivery, photos of the item packed…" /><SubmitButton size="sm">Send response</SubmitButton></form>
+          )}
+        </section>
+      ))}
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <section className="rounded-lg border border-line bg-white">
@@ -81,6 +93,8 @@ export default async function VendorOrder({ params, searchParams }: { params: Pr
               <p className="font-medium">{a.fullName}</p><p>{a.line1}{a.line2 ? `, ${a.line2}` : ""}</p><p>{a.city}, {a.state}</p><p className="mt-1 text-ink-muted">{a.phone}</p>
             </section>
           )}
+          {["NEW", "PROCESSING", "READY_FOR_DISPATCH"].includes(vo.status) && <a href={`/vendor/shipments?order=${vo.id}`} className="block rounded-lg border border-line bg-white p-4 text-sm text-brand hover:border-brand">Buy a carrier label for this order →</a>}
+          {vo.status === "SHIPPED" && <p className="rounded-lg border border-line bg-white p-4 text-[12px] text-ink-muted">If you confirm delivery yourself, earnings are held longer than when the buyer, a carrier scan or rider proof confirms it.</p>}
           {vo.shipments.map((s) => <section key={s.id} className="rounded-lg border border-line bg-white p-4 text-sm"><h2 className="mb-1 font-semibold">Shipment</h2><p>{s.carrier}{s.trackingNumber ? ` · ${s.trackingNumber}` : ""}</p><StatusBadge status={s.status} /></section>)}
         </aside>
       </div>
