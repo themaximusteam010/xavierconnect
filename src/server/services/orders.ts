@@ -50,6 +50,9 @@ export async function placeOrder(input: PlaceOrderInput) {
       const view = await loadCartView(tx, input.ident, input.shippingChoice);
       if (!view || view.items.length === 0) throw new CartError("Your cart is empty.");
       const { pricing, items } = view;
+      if (!input.ident.userId && items.some((i) => i.product.type === "DIGITAL")) {
+        throw new CartError("Please sign in to buy digital products, so your downloads are kept safely in your account.");
+      }
       const needsAddress = items.some((i) => i.product.type === "PHYSICAL");
       if (needsAddress && !input.address) throw new CartError("A delivery address is required.");
       for (const v of pricing.vendors) {

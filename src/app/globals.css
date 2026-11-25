@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+
+/* ─── Design tokens ─────────────────────────────────────────────────────────
+   One source of truth for colour, type, radius and elevation. Components use
+   these via Tailwind utilities (bg-brand, text-ink-muted, rounded-md ...). */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-brand: #1d4ed8;
+  --color-brand-hover: #1e40af;
+  --color-brand-soft: #eff4ff;
+  --color-brand-ink: #1e3a8a;
+
+  --color-ink: #111827;
+  --color-ink-2: #374151;
+  --color-ink-muted: #6b7280;
+  --color-ink-faint: #9ca3af;
+
+  --color-line: #e5e7eb;
+  --color-line-strong: #d1d5db;
+  --color-surface: #ffffff;
+  --color-canvas: #f7f7f5;
+  --color-sunken: #f3f4f6;
+
+  --color-success: #15803d;
+  --color-success-soft: #ecfdf3;
+  --color-warning: #b45309;
+  --color-warning-soft: #fffbeb;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fef2f2;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --shadow-pop: 0 1px 2px rgb(17 24 39 / 0.06), 0 8px 24px -6px rgb(17 24 39 / 0.14);
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+
+  --breakpoint-xs: 26rem;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    @apply bg-surface text-ink antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  ::selection { @apply bg-brand/15; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-brand; }
+  h1, h2, h3 { letter-spacing: -0.015em; }
+  input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
+}
+
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8; }
+  .eyebrow { @apply text-2xs font-semibold uppercase tracking-[0.12em] text-ink-muted; }
+  .tabular { font-variant-numeric: tabular-nums; }
+  .prose-xc { @apply text-[15px] leading-7 text-ink-2; }
+  .prose-xc h2 { @apply mt-8 mb-3 text-lg font-semibold text-ink; }
+  .prose-xc h3 { @apply mt-6 mb-2 font-semibold text-ink; }
+  .prose-xc p { @apply mb-4; }
+  .prose-xc ul { @apply mb-4 list-disc pl-5 space-y-1; }
+  .prose-xc a { @apply text-brand underline underline-offset-2; }
+}

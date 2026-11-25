@@ -1,0 +1,3 @@
+/** Common Nigerian banks with CBN/NIP codes. In production, load the live list from the payment provider (Paystack GET /bank). */
+export const BANKS: [name: string, code: string][] = [["Access Bank", "044"], ["First Bank of Nigeria", "011"], ["Guaranty Trust Bank", "058"], ["Zenith Bank", "057"], ["United Bank for Africa", "033"], ["Fidelity Bank", "070"], ["First City Monument Bank", "214"], ["Stanbic IBTC Bank", "221"], ["Sterling Bank", "232"], ["Union Bank of Nigeria", "032"], ["Wema Bank", "035"], ["Ecobank Nigeria", "050"], ["Polaris Bank", "076"], ["Kuda Bank", "50211"], ["Moniepoint MFB", "50515"], ["OPay", "999992"], ["PalmPay", "999991"]];
+export const bankName = (code: string) => BANKS.find(([, c]) => c === code)?.[0] ?? null;
