@@ -1,0 +1,17 @@
+import type { DbClient } from "@/server/db";
+
+export const SETTING_DEFAULTS = {
+  taxBps: 0, // VAT collected at checkout (0 by default; set 750 for 7.5% VAT)
+  settlementHoldDays: 3, // days after delivery before earnings become withdrawable
+  minPayoutMinor: "500000", // ₦5,000
+  reservationMinutes: 30, // how long unpaid orders hold stock
+  downloadMaxCount: 5,
+  downloadExpiryDays: 30,
+} as const;
+
+export type SettingKey = keyof typeof SETTING_DEFAULTS;
+
+export async function getSetting<K extends SettingKey>(db: DbClient, key: K): Promise<(typeof SETTING_DEFAULTS)[K]> {
+  const row = await db.platformSetting.findUnique({ where: { key } });
+  return (row?.value as (typeof SETTING_DEFAULTS)[K]) ?? SETTING_DEFAULTS[key];
+}

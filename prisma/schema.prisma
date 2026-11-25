@@ -703,6 +703,7 @@ model VendorOrder {
   commissionMinor  BigInt            @default(0)
   vendorNetMinor   BigInt            @default(0)
   shippingMethodId String?
+  deliveredAt      DateTime?
   settledAt        DateTime? // when earnings moved pending -> available
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
