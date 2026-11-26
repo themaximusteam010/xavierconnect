@@ -2,7 +2,7 @@
 title: Cookie Policy
 description: The cookies XavierConnect uses and why.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 Cookies are small files stored by your browser. XavierConnect uses only the cookies the site needs to work. **We do not use advertising, tracking or third-party analytics cookies.**
 

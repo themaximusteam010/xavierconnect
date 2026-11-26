@@ -2,7 +2,7 @@
 title: Intellectual Property Policy
 description: How to report listings that infringe trademarks, copyright or other rights.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 XavierConnect respects intellectual property rights and expects Sellers to do the same. Sellers are responsible for making sure their listings, images, descriptions, products and digital files do not infringe anyone's trademark, copyright, design or other rights.
 

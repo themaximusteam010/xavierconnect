@@ -2,13 +2,13 @@
 title: Terms and Conditions
 description: The rules for using XavierConnect as a buyer, seller or visitor.
 ---
-**Effective date:** [TO COMPLETE — the date you publish these terms]
+**Effective date:** 26 November 2026
 
 Please read these terms carefully. They explain your rights and obligations, limit our liability where the law allows, and explain how disputes are resolved. By creating an account, placing an order, booking a service or otherwise using XavierConnect, you agree to these terms. If you do not agree, do not use the platform.
 
 ## 1. Who we are
 
-XavierConnect ("**XavierConnect**", "**we**", "**us**") is an online marketplace operated by **Xavier Enterprise**, a business registered in Nigeria under [TO COMPLETE — CAC registration number], with its address at [TO COMPLETE — registered address]. You can contact us at support@xavierconnect.com or through the [Contact page](/contact).
+XavierConnect ("**XavierConnect**", "**we**", "**us**") is an online marketplace operated by **Xavier Enterprise**, a Nigerian business. You can contact us at support@xavierconnect.com or through the [Contact page](/contact).
 
 ## 2. What XavierConnect is — and what it is not
 

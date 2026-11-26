@@ -2,7 +2,7 @@
 title: Refund Policy
 description: When and how buyers are refunded on XavierConnect.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 Your payment is held by XavierConnect and is not released to the Seller until delivery is confirmed and a short holding period has passed. That is what makes refunds possible.
 

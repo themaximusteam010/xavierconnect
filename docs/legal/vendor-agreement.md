@@ -2,7 +2,7 @@
 title: Vendor Agreement
 description: The agreement between XavierConnect and every seller on the platform.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 This agreement is between **Xavier Enterprise** (operator of XavierConnect, "**we**") and you, the seller ("**Seller**", "**you**"). It applies in addition to our [Terms and Conditions](/legal/terms) and the policies linked from them. By applying to sell or listing anything, you accept it.
 

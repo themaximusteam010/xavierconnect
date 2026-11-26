@@ -2,16 +2,16 @@
 title: Privacy Policy
 description: How XavierConnect collects, uses, shares and protects personal data under the Nigeria Data Protection Act 2023.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 This policy explains what personal data XavierConnect collects, why, who we share it with, how long we keep it, and your rights under the **Nigeria Data Protection Act 2023** (NDPA) and related regulations.
 
 ## 1. Who is responsible for your data
 
-**Xavier Enterprise** ([TO COMPLETE — CAC number], [TO COMPLETE — registered address]) operates XavierConnect and is the **data controller** for the personal data described here.
+**Xavier Enterprise**, a Nigerian business, operates XavierConnect and is the **data controller** for the personal data described here.
 
 - Data protection contact: **privacy@xavierconnect.com**
-- Data Protection Officer: [TO COMPLETE — name, or "the Data Protection Officer"]
+- Data protection lead: our Data Protection Officer, reachable at the address above
 
 When a Seller receives your name, address and phone number to fulfil your order, the Seller also becomes responsible for using that data lawfully, and only to fulfil and support your order.
 

@@ -2,7 +2,7 @@
 title: Prohibited Items Policy
 description: Items and services that cannot be listed or sold on XavierConnect.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 Sellers are responsible for making sure everything they list is legal to sell in Nigeria and, for international Sellers, legal to export and import. The following must not be listed on XavierConnect:
 

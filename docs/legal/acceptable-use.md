@@ -2,7 +2,7 @@
 title: Acceptable Use and Messaging Policy
 description: The rules for behaviour, reviews and messaging on XavierConnect.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 ## 1. Keep transactions on XavierConnect
 

@@ -2,7 +2,7 @@
 title: Return Policy
 description: How to return items bought on XavierConnect.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 ## 1. What can be returned
 

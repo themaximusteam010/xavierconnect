@@ -2,7 +2,7 @@
 title: Shipping and Delivery Policy
 description: How delivery works on XavierConnect, including international orders.
 ---
-**Effective date:** [TO COMPLETE]
+**Effective date:** 26 November 2026
 
 ## 1. Every Seller ships separately
 
