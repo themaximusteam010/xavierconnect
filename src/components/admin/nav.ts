@@ -15,6 +15,7 @@ export const ADMIN_NAV: { href: string; label: string; p: Permission; group: str
   { href: "/admin/bookings", label: "Bookings", p: "order.view_all", group: "Operations" },
   { href: "/admin/shipping", label: "Shipping & logistics", p: "order.view_all", group: "Operations" },
   { href: "/admin/shipments", label: "Shipments", p: "order.view_all", group: "Operations" },
+  { href: "/admin/freight", label: "International freight", p: "order.view_all", group: "Operations" },
   { href: "/admin/disputes", label: "Disputes", p: "dispute.decide", group: "Operations" },
   { href: "/admin/support", label: "Support tickets", p: "support.view", group: "Operations" },
   { href: "/admin/communication", label: "Communication", p: "messages.moderate", group: "Operations" },

@@ -1,0 +1,7481 @@
+{
+ "openapi": "3.0.3",
+ "info": {
+  "title": "GIG THIRD PARTY API",
+  "version": "1.0.0",
+  "description": "Auto-generated OpenAPI documentation"
+ },
+ "servers": [
+  {
+   "url": "https://dev-thirdpartynode.theagilitysystems.com",
+   "description": "Development server"
+  }
+ ],
+ "paths": {
+  "/login": {
+   "post": {
+    "tags": [
+     "Auth"
+    ],
+    "summary": "User Login",
+    "description": "The Login API allows users to authenticate themselves using their registered email and password. Upon successful authentication, the API returns an access token that can be used for further API requests requiring authentication.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "a521f55a-8a95-4e1b-ae18-ab0ad0cd5f37",
+            "status": 200,
+            "data": {
+             "_id": "691c694d359350eb94783e87",
+             "Id": "e1e09dac-e6c2-45e3-8faf-5be37ae05af6",
+             "FirstName": "GIGL",
+             "LastName": "Test",
+             "Gender": 0,
+             "Designation": "Ecommerce",
+             "Department": "Ecommerce",
+             "PictureUrl": null,
+             "IsActive": true,
+             "Organisation": "Ecommerce",
+             "Status": 0,
+             "UserType": 0,
+             "IsDeleted": false,
+             "SystemUserId": "034f14e0-bbc0-432a-b550-f1e1cabde70c",
+             "SystemUserRole": "ThirdPartyCustomers",
+             "Email": "gigtestsystems@gmail.com",
+             "EmailConfirmed": false,
+             "PhoneNumber": "+2348123456789",
+             "PhoneNumberConfirmed": false,
+             "UserName": "ECO038082",
+             "UserChannelCode": "ECO038082",
+             "UserChannelType": 2,
+             "UserActiveCountryId": 1,
+             "AppType": null,
+             "IsMagaya": false,
+             "IsInternational": false,
+             "CountryType": null,
+             "DateCreated": "2025-11-18T00:00:00.000Z",
+             "DateModified": "2025-11-18T00:00:00.000Z",
+             "Claim": "Create.ThirdParty,Delete.ThirdParty,Update.ThirdParty,View.ThirdParty",
+             "CustomerType": 0,
+             "CompanyType": 1,
+             "access-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJlMWUwOWRhYy1lNmMyLTQ1ZTMtOGZhZi01YmUzN2FlMDVhZjYiLCJDdXN0b21lclR5cGUiOjAsIkNvbXBhbnlUeXBlIjoxLCJBY3Rpdml0eSI6IkNyZWF0ZS5UaGlyZFBhcnR5LERlbGV0ZS5UaGlyZFBhcnR5LFVwZGF0ZS5UaGlyZFBhcnR5LFZpZXcuVGhpcmRQYXJ0eSIsIlVzZXJDaGFubmVsQ29kZSI6IkVDTzAzODA4MiIsIlVzZXJSb2xlcyI6WyJUaGlyZFBhcnR5Il0sIkZpcnN0TmFtZSI6IkdJR0wiLCJMYXN0TmFtZSI6IlRlc3QiLCJpYXQiOjE3NjcwMDI1MzcsImV4cCI6MTc2ODczMDUzN30.LYBqooKTS0sw5JU_X7La6I9FgCcRnmdcRQTDXCFVOcc"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postLogin"
+       },
+       "example": {}
+      }
+     }
+    }
+   }
+  },
+  "/price": {
+   "post": {
+    "tags": [
+     "Price"
+    ],
+    "summary": "Fetch Shipment Price",
+    "description": "Fetch price details for the shipment.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "8ad50541-a6d1-4b27-9745-7264e99ca1e9",
+            "status": 200,
+            "data": {
+             "isWithinProcessingTime": false,
+             "MainCharge": 425243.458,
+             "DeliverPrice": 382719.112,
+             "PickupCharge": 3315,
+             "InsuranceValue": 400,
+             "GrandTotal": 386034.112,
+             "DeclaredValue": 40000,
+             "Discount": 0,
+             "ShipmentItems": [
+              {
+               "ItemName": "Senator Fabric #11",
+               "Description": "Test fabric description",
+               "Quantity": 100,
+               "Weight": 0.01,
+               "IsVolumetric": false,
+               "ShipmentType": 1,
+               "Value": 40000,
+               "CalculatedPrice": 425243.458
+              }
+             ]
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postPrice"
+       },
+       "example": {
+        "SenderStationId": 3,
+        "ReceiverStationId": 3,
+        "VehicleType": 2,
+        "ReceiverLocation": {
+         "Latitude": 6.6018,
+         "Longitude": 3.3515
+        },
+        "SenderLocation": {
+         "Latitude": 6.451,
+         "Longitude": 3.4844
+        },
+        "CustomerCode": "ECO038082",
+        "CustomerType": 0,
+        "PickUpOptions": 1,
+        "ShipmentItems": [
+         {
+          "ItemName": "Senator Fabric #11",
+          "Description": "Test fabric description",
+          "Quantity": 100,
+          "Weight": 0.01,
+          "IsVolumetric": false,
+          "ShipmentType": 1,
+          "Value": 40000
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/price/v3": {
+   "post": {
+    "tags": [
+     "Price"
+    ],
+    "summary": "Fetch Shipment Price V3",
+    "description": "Fetch price details for the shipment using Price V3 schema.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "375f2c43-23d9-43a8-8fdb-47b70d20fcdb",
+            "status": 200,
+            "data": {
+             "GrandTotal": 417960,
+             "DeliveryOptionPrice": 100,
+             "DeliveryPrice": 388800,
+             "Vat": 29160,
+             "Discount": 7776,
+             "InsurancePrice": 7776,
+             "SurchargeFee": 200
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postPriceV3"
+       },
+       "example": {
+        "SenderStationId": 3,
+        "ReceiverStationId": 3,
+        "VehicleType": 2,
+        "ReceiverLocation": {
+         "Latitude": 6.6018,
+         "Longitude": 3.3515
+        },
+        "SenderLocation": {
+         "Latitude": 6.451,
+         "Longitude": 3.4844
+        },
+        "IsPriorityShipment": false,
+        "PickUpOptions": 1,
+        "ShipmentItems": [
+         {
+          "ItemName": "Senator Fabric #11",
+          "Description": "Test fabric description",
+          "Quantity": 100,
+          "Weight": 0.01,
+          "IsVolumetric": false,
+          "ShipmentType": 1,
+          "Value": 40000
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/price/bulk": {
+   "post": {
+    "tags": [
+     "Price"
+    ],
+    "summary": "Fetch Bulk Shipment Price",
+    "description": "Fetch price details for bulk shipments.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "61336c7f-ffcf-47ed-8b19-dd3786cca399",
+            "status": 200,
+            "data": [
+             {
+              "isWithinProcessingTime": false,
+              "MainCharge": 425243.458,
+              "DeliverPrice": 382719.112,
+              "PickupCharge": 3315,
+              "InsuranceValue": 400,
+              "GrandTotal": 386034.112,
+              "DeclaredValue": 40000,
+              "Discount": 0,
+              "ShipmentItems": [
+               {
+                "ItemName": "Senator Fabric #11",
+                "Description": "Test fabric description",
+                "Quantity": 100,
+                "Weight": 0.01,
+                "IsVolumetric": false,
+                "ShipmentType": 1,
+                "Value": 40000,
+                "CalculatedPrice": 425243.458
+               }
+              ]
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postPriceBulk"
+       },
+       "example": {
+        "ReceiverDetails": {
+         "ReceiverStationId": 4,
+         "ReceiverLocation": {
+          "Latitude": "6.6018",
+          "Longitude": "3.3515"
+         }
+        },
+        "Shipments": [
+         {
+          "Merchant": {
+           "CustomerCode": "ECO038082",
+           "CustomerType": 0,
+           "SenderStationId": 4,
+           "SenderLocation": {
+            "Latitude": "6.4510",
+            "Longitude": "3.4844"
+           }
+          },
+          "ShipmentDetails": {
+           "VehicleType": 2,
+           "PickUpOptions": 1
+          },
+          "ShipmentItems": [
+           {
+            "ItemName": "Senator Fabric #11",
+            "Description": "Test fabric description",
+            "Quantity": 100,
+            "Weight": 0.01,
+            "IsVolumetric": false,
+            "ShipmentType": 1,
+            "Value": 40000
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/dropOff/price": {
+   "post": {
+    "tags": [
+     "Price"
+    ],
+    "summary": "Fetch DropOff Price",
+    "description": "Fetch price details for drop-off shipments.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "90e618d1-efaf-4fce-8638-39e604bf9276",
+            "status": 200,
+            "data": {
+             "MainCharge": 449055.12,
+             "DeliverPrice": 449055.12,
+             "PickupCharge": 0,
+             "InsuranceValue": 400,
+             "GrandTotal": 449055.12,
+             "DeclaredValue": 40000,
+             "Discount": 0,
+             "ShipmentItems": [
+              {
+               "ItemName": "Senator Fabric #11",
+               "Description": "Test fabric description",
+               "Quantity": 100,
+               "Weight": 0.01,
+               "IsVolumetric": false,
+               "ShipmentType": 1,
+               "Value": 40000,
+               "CalculatedPrice": 449055.12
+              }
+             ]
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postDropoffPrice"
+       },
+       "example": {
+        "SenderStationId": 3,
+        "ReceiverStationId": 3,
+        "DeliveryType": 0,
+        "PickUpOptions": 1,
+        "ShipmentItems": [
+         {
+          "ItemName": "Senator Fabric #11",
+          "Description": "Test fabric description",
+          "Quantity": 100,
+          "Weight": 0.01,
+          "IsVolumetric": false,
+          "ShipmentType": 1,
+          "Value": 40000
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/dropOff/price/bulk": {
+   "post": {
+    "tags": [
+     "Price"
+    ],
+    "summary": "Fetch Bulk DropOff Price",
+    "description": "Fetch price details for multiple drop-off shipments in a single request. Each shipment in the array follows the same validation rules as the single /dropOff/price endpoint. Returns an array of price calculations for each shipment.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "34e099da-2fca-4e39-a6cf-74b65df5241c",
+            "status": 200,
+            "data": [
+             {
+              "ShipmentIndex": 0,
+              "MainCharge": 449055.12,
+              "DeliverPrice": 449055.12,
+              "PickupCharge": 0,
+              "InsuranceValue": 400,
+              "GrandTotal": 449055.12,
+              "DeclaredValue": 40000,
+              "Discount": 0,
+              "ShipmentItems": [
+               {
+                "ItemName": "Senator Fabric #11",
+                "Description": "Test fabric description",
+                "Quantity": 100,
+                "Weight": 0.01,
+                "IsVolumetric": false,
+                "ShipmentType": 1,
+                "Value": 40000,
+                "CalculatedPrice": 449055.12
+               }
+              ]
+             },
+             {
+              "ShipmentIndex": 1,
+              "MainCharge": 14126.601,
+              "DeliverPrice": 14126.601,
+              "PickupCharge": 0,
+              "InsuranceValue": 500,
+              "GrandTotal": 24297.754,
+              "DeclaredValue": 50000,
+              "Discount": 0,
+              "ShipmentItems": [
+               {
+                "ItemName": "Electronics",
+                "Description": "Smartphone",
+                "Quantity": 2,
+                "Weight": 0.5,
+                "IsVolumetric": false,
+                "ShipmentType": 1,
+                "Value": 50000,
+                "CalculatedPrice": 14126.601
+               }
+              ]
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postDropoffPriceBulk"
+       },
+       "example": {
+        "Shipments": [
+         {
+          "SenderStationId": 3,
+          "ReceiverStationId": 3,
+          "DeliveryType": 0,
+          "PickUpOptions": 1,
+          "ShipmentItems": [
+           {
+            "ItemName": "Senator Fabric #11",
+            "Description": "Test fabric description",
+            "Quantity": 100,
+            "Weight": 0.01,
+            "IsVolumetric": false,
+            "ShipmentType": 1,
+            "Value": 40000
+           }
+          ]
+         },
+         {
+          "SenderStationId": 4,
+          "ReceiverStationId": 5,
+          "DeliveryType": 1,
+          "PickUpOptions": 0,
+          "ShipmentItems": [
+           {
+            "ItemName": "Electronics",
+            "Description": "Smartphone",
+            "Quantity": 2,
+            "Weight": 0.5,
+            "IsVolumetric": false,
+            "ShipmentType": 1,
+            "Value": 50000
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/capture/preshipment/shein": {
+   "post": {
+    "tags": [
+     "Shipment"
+    ],
+    "summary": "Capture Shein shipment",
+    "description": "Uses the legacy nested capture payload. Waybill is optional: supplied waybills are preserved; otherwise a waybill is generated with the SH prefix using service centre 491. Sender station is fixed at 4 and departure service centre at 491. Shipment and item prices are fixed at 1; no wallet validation, debit or payment is performed. When ShipmentDetails.CashOnDeliveryAmount is greater than zero, COD is enabled, a CashOnDeliveryRegisterAccount is created in SQL and MongoDB, and preshipment COD status is marked as initiated. Reference lookups are cached in Redis for five minutes with database fallback. Writes PreShipmentMobile, PreShipmentItemMobile, Shipment, ShipmentItem, MobileShipmentTracking and DeliveryNumber in SQL and MongoDB, plus the COD register when applicable. The legacy /capture/preshiment/shein route is also supported.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Shipment created successfully.",
+            "status": 200,
+            "data": {
+             "Waybill": "SH1491000001"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postCapturePreshipmentShein"
+       },
+       "example": {}
+      }
+     }
+    }
+   }
+  },
+  "/capture/preshipment": {
+   "post": {
+    "tags": [
+     "Shipment"
+    ],
+    "summary": "Capture PreShipment Mobile",
+    "description": "Capture shipment details.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Shipment created successfully.",
+            "apiId": "b25a666f-cbcd-49ee-b66b-805e220dcc9f",
+            "status": 200,
+            "data": {
+             "Waybill": "1349107274"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postCapturePreshipment"
+       },
+       "example": {
+        "SenderDetails": {
+         "SenderName": "John Doe",
+         "SenderPhoneNumber": "+1234567890",
+         "SenderStationId": 4,
+         "SenderAddress": "123 Example Street, City, Country",
+         "InputtedSenderAddress": "123 Example Street, City, Country",
+         "SenderLocality": "Example Locality",
+         "SenderLocation": {
+          "Latitude": "12.345678",
+          "Longitude": "-98.765432",
+          "FormattedAddress": "",
+          "Name": "",
+          "LGA": ""
+         }
+        },
+        "ReceiverDetails": {
+         "ReceiverStationId": 2,
+         "ReceiverName": "Jane Smith",
+         "ReceiverPhoneNumber": "+0987654321",
+         "ReceiverAddress": "456 Another Street, City, Country",
+         "InputtedReceiverAddress": "456 Another Street, City, Country",
+         "ReceiverLocation": {
+          "Latitude": "23.456789",
+          "Longitude": "-87.654321",
+          "FormattedAddress": "",
+          "Name": "",
+          "LGA": ""
+         }
+        },
+        "ShipmentDetails": {
+         "VehicleType": 0,
+         "IsBatchPickUp": 0,
+         "IsFromAgility": 0
+        },
+        "ShipmentItems": [
+         {
+          "ItemName": "Example Item",
+          "Description": "A sample shipment item",
+          "ShipmentType": 0,
+          "Quantity": 1,
+          "Weight": 2.5,
+          "IsVolumetric": false,
+          "Length": 10,
+          "Width": 5,
+          "Height": 3,
+          "Value": 1000,
+          "SpecialPackageId": 1,
+          "HaulageId": 0
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/get/preshipment": {
+   "get": {
+    "tags": [
+     "Shipment"
+    ],
+    "summary": "Get PreShipment Mobile Details",
+    "description": "Retrieve preshipment mobile details using the waybill number.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "b880dcdf-d100-4ff9-813d-ff7953f90adb",
+            "status": 200,
+            "data": [
+             {
+              "_id": "69527b1b4c22d36ca65031a7",
+              "PreShipmentMobileId": 9927,
+              "Waybill": "1349107274",
+              "SenderName": "John Doe",
+              "SenderPhoneNumber": "+1234567890",
+              "Value": 0,
+              "CustomerType": 0,
+              "CompanyType": 1,
+              "CustomerCode": "ECO038082",
+              "ReceiverName": "Jane Smith",
+              "ReceiverPhoneNumber": "+0987654321",
+              "ReceiverAddress": "456 Another Street, City, Country",
+              "SenderStationId": 4,
+              "ReceiverStationId": 2,
+              "IsHomeDelivery": true,
+              "GrandTotal": 7586.299,
+              "IsCashOnDelivery": false,
+              "CashOnDeliveryAmount": 0,
+              "UserId": "e1e09dac-e6c2-45e3-8faf-5be37ae05af6",
+              "IsdeclaredVal": false,
+              "DiscountValue": 0,
+              "Vat": 0,
+              "InsuranceValue": 10,
+              "DeliveryPrice": 4854.899,
+              "ShipmentPackagePrice": 0,
+              "vatvalue_display": 0,
+              "IsCancelled": false,
+              "IsConfirmed": false,
+              "IsDeleted": false,
+              "SenderAddress": "123 Example Street, City, Country",
+              "shipmentstatus": "Shipment created",
+              "IsDelivered": false,
+              "VehicleType": "Car",
+              "ZoneMapping": 2,
+              "CountryId": 0,
+              "ShipmentPickupPrice": 0,
+              "InputtedReceiverAddress": "456 Another Street, City, Country",
+              "SenderLocality": "Example Locality",
+              "InputtedSenderAddress": "123 Example Street, City, Country",
+              "IsScheduled": false,
+              "DestinationServiceCenterId": 0,
+              "IsBatchPickUp": false,
+              "IsFromAgility": false,
+              "Haulageid": 0,
+              "InternationalShippingCost": 0,
+              "CompanyMap": 0,
+              "IsInternationalShipment": false,
+              "DeclarationOfValueCheck": 0,
+              "DepartureCountryId": 1,
+              "DestinationCountryId": 1,
+              "IsCoupon": false,
+              "CODStatus": 0,
+              "IsAlpha": false,
+              "IsPriority": false,
+              "IsRerouted": false,
+              "IsReturned": false,
+              "IsClassShipment": false,
+              "DateCreated": "2025-12-29T12:59:07.603Z",
+              "DateModified": "2025-12-29T13:00:02.074Z",
+              "WaybillImageUrl": "https://thirdparty-api.s3.eu-west-2.amazonaws.com/WaybillImages/76072601331767013201379-1349107274AI.png"
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "Waybill",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/track/mobileShipment": {
+   "get": {
+    "tags": [
+     "Shipment"
+    ],
+    "summary": "",
+    "description": "",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "Waybill",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "fetchOption",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "number",
+       "format": "float",
+       "enum": [
+        1,
+        2
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "/track/multipleMobileShipment": {
+   "post": {
+    "tags": [
+     "Shipment"
+    ],
+    "summary": "",
+    "description": "",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postTrackMultiplemobileshipment"
+       },
+       "example": {}
+      }
+     }
+    }
+   }
+  },
+  "/capture/bulk/preshipment": {
+   "post": {
+    "tags": [
+     "Shipment"
+    ],
+    "summary": "",
+    "description": "",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postCaptureBulkPreshipment"
+       },
+       "example": {}
+      }
+     }
+    }
+   }
+  },
+  "/localstations/get": {
+   "get": {
+    "tags": [
+     "Geographical Data"
+    ],
+    "summary": "Fetch Local Stations",
+    "description": "This API returns all the local stations of GIG Logistics in Nigeria.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "ca965484-8541-4cfe-94b9-0a7c8e360d4f",
+            "status": 200,
+            "data": [
+             {
+              "_id": "66d6b4e05f6570f0f171d159",
+              "StationId": 1,
+              "StationName": "ABA",
+              "StationCode": "ABA",
+              "StateId": 1,
+              "IsDeleted": false,
+              "SuperServiceCentreId": 1,
+              "StationPickupPrice": 0,
+              "IsPublic": true,
+              "DateCreated": "2018-01-29T16:45:21.770Z",
+              "DateModified": "2018-01-29T16:45:21.770Z",
+              "StateName": "ABIA",
+              "CountryName": "NIGERIA",
+              "CountryId": 1,
+              "CountryCode": "NIGERIA",
+              "CurrencyCode": "NGN",
+              "CurrencySymbol": "\u20a6",
+              "GiggoActive": false
+             },
+             {
+              "_id": "66d6b4e05f6570f0f171d17d",
+              "StationId": 37,
+              "StationName": "ABAKALIKI",
+              "StationCode": "ABL",
+              "StateId": 11,
+              "IsDeleted": false,
+              "SuperServiceCentreId": 291,
+              "StationPickupPrice": 0,
+              "IsPublic": true,
+              "DateCreated": "2018-01-29T16:45:23.177Z",
+              "DateModified": "2018-01-29T16:45:23.177Z",
+              "StateName": "EBONYI",
+              "CountryName": "NIGERIA",
+              "CountryId": 1,
+              "CountryCode": "NIGERIA",
+              "CurrencyCode": "NGN",
+              "CurrencySymbol": "\u20a6",
+              "GiggoActive": false
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": []
+   }
+  },
+  "/internationalStations/get": {
+   "get": {
+    "tags": [
+     "Geographical Data"
+    ],
+    "summary": "Fetch International Stations",
+    "description": "This API returns all the stations of GIG Logistics which are not in Nigeria.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "e6635a73-f58c-4792-ae25-236e75736b82",
+            "status": 200,
+            "data": [
+             {
+              "_id": "693fa4c05eaebaa4be1fa20a",
+              "StationId": 288,
+              "StationCode": "KUM",
+              "StateId": 262,
+              "SuperServiceCentreId": 0,
+              "IsPublic": true,
+              "StateName": "KUMASI METROPOLITAN",
+              "CountryName": "GHANA",
+              "CountryId": 76,
+              "CountryCode": "GHANA"
+             },
+             {
+              "_id": "66d6b4e05f6570f0f171d272",
+              "StationId": 282,
+              "StationName": "ACCRA",
+              "StationCode": "ACC",
+              "StateId": 255,
+              "SuperServiceCentreId": 344,
+              "IsPublic": true,
+              "StateName": "ACCRA METROPOLITAN",
+              "CountryName": "GHANA",
+              "CountryId": 76,
+              "CountryCode": "GHANA"
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": []
+   }
+  },
+  "/serviceCentresByStation": {
+   "get": {
+    "tags": [
+     "Geographical Data"
+    ],
+    "summary": "Fetch Service Centres by Station",
+    "description": "",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "4797ff66-17ea-4d62-8d19-250bf35f6490",
+            "status": 200,
+            "data": [
+             {
+              "StationId": 4,
+              "StationName": "LAGOS",
+              "StationCode": "LOS",
+              "StateId": 24,
+              "ServiceCentreId": 18,
+              "ServiceCentreName": "IKOTUN",
+              "ServiceCentreCode": "IKT",
+              "Latitude": 6.550577,
+              "Longitude": 3.268126,
+              "Address": " 29, Idimu Road, Opp. Local Govt. Council, Ikotun, Lagos"
+             },
+             {
+              "StationId": 4,
+              "StationName": "LAGOS",
+              "StationCode": "LOS",
+              "StateId": 24,
+              "ServiceCentreId": 29,
+              "ServiceCentreName": "YABA (TEJUOSHO SHOPPING COMPLEX)",
+              "ServiceCentreCode": "YAB",
+              "Latitude": 6.509097,
+              "Longitude": 3.370451,
+              "Address": "Tejuosho Ultra Modern Market, Ojuelegba Road, Yaba, Lagos"
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "StationId",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "number",
+       "format": "float"
+      }
+     }
+    ]
+   }
+  },
+  "/lga/active": {
+   "get": {
+    "tags": [
+     "Geographical Data"
+    ],
+    "summary": "Fetch Active LGAs",
+    "description": "This API returns all active LGAs.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [],
+    "parameters": [
+     {
+      "name": "StateId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     },
+     {
+      "name": "Search",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "Limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     },
+     {
+      "name": "Skip",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     }
+    ]
+   }
+  },
+  "/country/get": {
+   "get": {
+    "tags": [
+     "Geographical Data"
+    ],
+    "summary": "Fetch country list",
+    "description": "This API returns all list of countries",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "fe4160c6-7f6b-4839-9513-3bf32671a96d",
+            "status": 200,
+            "data": [
+             {
+              "_id": "66c5a69adbb5b961da9a4ca0",
+              "CountryId": 62,
+              "CountryName": "UK",
+              "CountryCode": "UK",
+              "IsDeleted": false,
+              "RowVersion": {
+               "type": "Buffer",
+               "data": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                39,
+                65,
+                179
+               ]
+              },
+              "CurrencySymbol": "\u00a3",
+              "CurrencyCode": "GBP",
+              "CurrencyRatio": 530,
+              "IsActive": true,
+              "PhoneNumberCode": "+44",
+              "ContactNumber": "Not Available",
+              "ContactEmail": "Not Available",
+              "TermAndConditionAmount": "10",
+              "TermAndConditionCountry": "UNITED KINGDOM",
+              "CountryFlag": "https://api.gigagilitysystems.com/Images/ukflag.png",
+              "IsInternationalShippingCountry": true,
+              "CourierEnable": "DHL",
+              "CountryShortCode": "GB",
+              "DateCreated": "2018-02-19T12:58:30.030Z",
+              "DateModified": "2018-02-19T12:58:30.030Z",
+              "Timezone": "Europe/London"
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [],
+    "parameters": [
+     {
+      "name": "CountryName",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/homedelivery/active": {
+   "get": {
+    "tags": [
+     "Geographical Data"
+    ],
+    "summary": "",
+    "description": "",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "StateId",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     },
+     {
+      "name": "Search",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "Limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     },
+     {
+      "name": "Skip",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer"
+      }
+     }
+    ]
+   }
+  },
+  "/companyDetails/get": {
+   "get": {
+    "tags": [
+     "Company"
+    ],
+    "summary": "Fetch Company Details",
+    "description": "Fetch details using merchant email.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "68f1aedc-108a-49fe-b7eb-1028e1ccf38d",
+            "status": 200,
+            "data": [
+             {
+              "_id": "691c69a70208d621bb60365c",
+              "CompanyId": 44977,
+              "Name": "GIGL Test",
+              "RcNumber": null,
+              "Email": "gigtestsystems@gmail.com",
+              "City": "Lagos",
+              "State": "LAGOS",
+              "Address": "Gbagada, Lagos",
+              "PhoneNumber": "+2348123456789",
+              "Industry": "Logistics",
+              "CompanyType": 1,
+              "CompanyStatus": 1,
+              "CustomerCode": "ECO038082",
+              "Discount": 0,
+              "SettlementPeriod": 2000,
+              "IsDeleted": false,
+              "RowVersion": "AAAAAAIUOKs=",
+              "CustomerCategory": 0,
+              "ReturnOption": null,
+              "ReturnServiceCentre": 346,
+              "ReturnAddress": "Gbagada, Lagos",
+              "Password": null,
+              "FirstName": null,
+              "LastName": null,
+              "UserActiveCountryId": 1,
+              "IsRegisteredFromMobile": false,
+              "isCodNeeded": false,
+              "WalletAmount": null,
+              "IsEligible": true,
+              "AccountName": null,
+              "AccountNumber": null,
+              "BankName": null,
+              "ProductType": null,
+              "Rank": 0,
+              "BVN": null,
+              "IdentificationNumber": null,
+              "IdentificationImageUrl": null,
+              "IdentificationType": 0,
+              "IsInternational": false,
+              "RankModificationDate": "2025-11-18T12:04:55.913Z",
+              "TransactionType": 0,
+              "AssignedCustomerRep": null,
+              "NUBANAccountNo": null,
+              "PrefferedNubanBank": null,
+              "NUBANCustomerId": 0,
+              "NUBANCustomerCode": null,
+              "NUBANCustomerName": null,
+              "FlatDiscount": false,
+              "FlatDiscountInterState": 0,
+              "FlatDiscountIntraState": 0,
+              "HomeDeliveryFlatDiscountInterState": 0,
+              "HomeDeliveryFlatDiscountIntraState": 0,
+              "IsTopUp": false,
+              "IsVFS": false,
+              "DateCreated": "2025-11-18T12:04:56.633Z",
+              "DateModified": "2025-11-18T12:04:56.633Z"
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "Email",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/chargeWallet": {
+   "put": {
+    "tags": [
+     "Wallet"
+    ],
+    "summary": "Charge User Wallet",
+    "description": "Charge customer wallet based on bill type.\n      > **Note:** Wallet balance is validated before debit operations. \n      \n      Bill Type Mapping\n\n      | BillType | Description                     | Wallet Impact |\n      |---------:|---------------------------------|---------------|\n      | 0        | Class Subscription              | Debit         |\n      | 1        | TV Subscription                 | Debit         |\n      | 2        | Airtime Subscription            | Debit         |\n      | 3        | Data Subscription               | Debit         |\n      | 4        | Electricity Subscription        | Debit         | ",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Wallet has been charged successfully.",
+            "apiId": "d0277946-6356-42bb-9280-f2606e94c611",
+            "status": 200,
+            "data": {}
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/putChargewallet"
+       },
+       "example": {
+        "UserId": "e1e09dac-e6c2-45e3-8faf-5be37ae05af6",
+        "Amount": 10,
+        "BillType": 2,
+        "ReferenceNo": "*****234",
+        "Description": "Airtime Description"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/invoice/generate": {
+   "post": {
+    "tags": [
+     "Invoice"
+    ],
+    "summary": "Generate Shipment Invoice",
+    "description": "Generate invoice for a shipment using shipment waybill.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "207f26fa-d2cb-451c-90dd-222012f4ee63",
+            "status": 200,
+            "data": {
+             "WaybillLabel": "https://thirdparty-api.s3.eu-west-2.amazonaws.com/WaybillImages/45015969441757421874352-mypdf.pdf"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postInvoiceGenerate"
+       },
+       "example": {
+        "Waybill": "1015001681"
+       }
+      }
+     }
+    }
+   }
+  },
+  "/create/dropOff": {
+   "post": {
+    "tags": [
+     "DropOff"
+    ],
+    "summary": "Create DropOff Shipment",
+    "description": "The Create DropOff Shipment allows users to capture a dropoff shipment. This ensures validation of sender and receiver details, shipment items based on Business.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "a6c52ce7-1555-424a-954c-ddbfd186226e",
+            "status": 200,
+            "data": {
+             "TempCode": "PRE000568-APH"
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postCreateDropoff"
+       },
+       "example": {
+        "SenderDetails": {
+         "SenderName": "JJJSSSS",
+         "SenderPhoneNumber": "+234234567890",
+         "SenderCity": "New York",
+         "DepartureStationId": 4
+        },
+        "ReceiverDetails": {
+         "ReceiverName": "Jane Smith",
+         "ReceiverPhoneNumber": "+23456458669736",
+         "ReceiverAddress": "456 Elm Street",
+         "ReceiverCity": "Los Angeles",
+         "DestinationStationId": 4,
+         "DestinationServiceCenterId": 14
+        },
+        "ShipmentDetails": {
+         "DeliveryType": 1,
+         "PickupOptions": 0,
+         "IsCashOnDelivery": 1,
+         "CashOnDeliveryAmount": 500
+        },
+        "ShipmentItems": [
+         {
+          "ItemName": "",
+          "Description": "",
+          "SpecialPackageId": 10,
+          "Quantity": 1,
+          "Weight": 3.5,
+          "IsVolumetric": false,
+          "Length": 0,
+          "Width": 0,
+          "Height": 0,
+          "ShipmentType": 0,
+          "Value": 1200,
+          "Nature": "Fragile"
+         },
+         {
+          "ItemName": "ABCD",
+          "Description": "ABCD",
+          "SpecialPackageId": 0,
+          "Quantity": 1,
+          "Weight": 3.5,
+          "IsVolumetric": false,
+          "Length": 0,
+          "Width": 0,
+          "Height": 0,
+          "ShipmentType": 1,
+          "Value": 1200,
+          "Nature": "Fragile"
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/create/dropOff/bulk": {
+   "post": {
+    "tags": [
+     "DropOff"
+    ],
+    "summary": "Create Multiple DropOff Shipments in Bulk",
+    "description": "The Create Bulk DropOff Shipment allows users to create multiple dropoff shipments in a single request. Each shipment follows the same validation rules as the single create/dropOff endpoint.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "6dff493f-9c0e-45c0-97f7-044638f3a7c2",
+            "status": 200,
+            "data": [
+             {
+              "ShipmentIndex": 0,
+              "Success": true,
+              "Data": {
+               "TempCode": "PRE000753-APH"
+              }
+             },
+             {
+              "ShipmentIndex": 1,
+              "Success": true,
+              "Data": {
+               "TempCode": "PRE000754-APH"
+              }
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postCreateDropoffBulk"
+       },
+       "example": {
+        "Shipments": [
+         {
+          "SenderDetails": {
+           "SenderName": "John Doe",
+           "SenderPhoneNumber": "+234234567890",
+           "SenderCity": "Lagos",
+           "DepartureStationId": 4
+          },
+          "ReceiverDetails": {
+           "ReceiverName": "Jane Smith",
+           "ReceiverPhoneNumber": "+23456458669736",
+           "ReceiverAddress": "456 Elm Street",
+           "ReceiverCity": "Ikeja",
+           "DestinationStationId": 5,
+           "DestinationServiceCenterId": 14
+          },
+          "ShipmentDetails": {
+           "DeliveryType": 1,
+           "PickupOptions": 0,
+           "IsCashOnDelivery": 1,
+           "CashOnDeliveryAmount": 500
+          },
+          "ShipmentItems": [
+           {
+            "SpecialPackageId": 10,
+            "Quantity": 1,
+            "Weight": 3.5,
+            "IsVolumetric": false,
+            "ShipmentType": 0,
+            "Value": 1200,
+            "Nature": "Fragile"
+           }
+          ]
+         },
+         {
+          "SenderDetails": {
+           "SenderName": "Alice Johnson",
+           "SenderPhoneNumber": "+234987654321",
+           "SenderCity": "Abuja",
+           "DepartureStationId": 6
+          },
+          "ReceiverDetails": {
+           "ReceiverName": "Bob Williams",
+           "ReceiverPhoneNumber": "+234123456789",
+           "ReceiverAddress": "789 Oak Avenue",
+           "ReceiverCity": "Kano",
+           "DestinationStationId": 7,
+           "DestinationServiceCenterId": 15
+          },
+          "ShipmentDetails": {
+           "DeliveryType": 0,
+           "PickupOptions": 1,
+           "IsCashOnDelivery": 0,
+           "CashOnDeliveryAmount": 0
+          },
+          "ShipmentItems": [
+           {
+            "ItemName": "Electronics",
+            "Description": "Smartphone",
+            "Quantity": 2,
+            "Weight": 0.5,
+            "IsVolumetric": false,
+            "ShipmentType": 1,
+            "Value": 50000,
+            "Nature": "Electronics"
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/intlShipment/price": {
+   "post": {
+    "tags": [
+     "International Shipment"
+    ],
+    "summary": "Fetch International Shipment",
+    "description": "Get price of international shipment",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "message": "Success",
+            "apiId": "9dfb5ea7-426a-40b7-9d4d-a789fc31a8c2",
+            "status": 200,
+            "data": [
+             {
+              "GrandTotal": 114534.49,
+              "Discount": 0,
+              "Insurance": 0,
+              "VAT": 7502.41,
+              "VaccumSeal": 2000,
+              "PhytosanitaryCertification": 5000,
+              "Amount": 100032.08,
+              "Currency": "\u20a6",
+              "LogisticCompany": 0,
+              "ShipmentMethod": 0,
+              "DeliveryType": 2,
+              "EstimatedDeliveryDateAndTime": "2026-03-02T10:45:58.229Z",
+              "DeclaredValue": 100
+             },
+             {
+              "GrandTotal": 87659.49,
+              "Discount": 0,
+              "Insurance": 0,
+              "VAT": 5627.41,
+              "VaccumSeal": 2000,
+              "PhytosanitaryCertification": 5000,
+              "Amount": 75032.08,
+              "Currency": "\u20a6",
+              "LogisticCompany": 0,
+              "ShipmentMethod": 0,
+              "DeliveryType": 0,
+              "EstimatedDeliveryDateAndTime": "2026-03-02T10:45:58.752Z",
+              "DeclaredValue": 100
+             }
+            ]
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postIntlshipmentPrice"
+       },
+       "example": {
+        "DestinationCountryId": 36,
+        "ReceiverCity": "Tracy",
+        "ReceiverAddress": "address",
+        "ReceiverPostalCode": "M5V 3L9",
+        "ReceiverCountryCode": "CA",
+        "ReceiverCountry": "Canada",
+        "PickupOptions": 1,
+        "DeclaredValue": 1233,
+        "IsVacuumSeal": true,
+        "IsPhytosanitaryCertification": true,
+        "ShipmentItems": [
+         {
+          "InternationalShipmentItemType": 0,
+          "Description": "some desc",
+          "Weight": 1,
+          "Quantity": 1,
+          "Nature": 1,
+          "IsVolumetric": true,
+          "Length": 11,
+          "Width": 11,
+          "Height": 11,
+          "PackagingType": 1,
+          "Value": 50
+         },
+         {
+          "InternationalShipmentItemType": 1,
+          "Description": "some desc",
+          "Weight": 1,
+          "Quantity": 1,
+          "Nature": 1,
+          "Value": 50
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/intlShipment/create": {
+   "post": {
+    "tags": [
+     "International Shipment"
+    ],
+    "summary": "Capture International shipment from nigeria to outside.",
+    "description": "Capture International shipment",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postIntlshipmentCreate"
+       },
+       "example": {}
+      }
+     }
+    }
+   }
+  },
+  "/intlShipment/inbound/price": {
+   "post": {
+    "tags": [
+     "International Shipment"
+    ],
+    "summary": "Price an inbound shipment to Nigeria",
+    "description": "Fetch an inbound shipment price from the UK (62), USA (207), or China (43) to Nigeria. Document items use InternationalShipmentItemType 1. Non-document items use type 0 and require weight and dimensions.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": [
+            {
+             "grandTotal": 71519.89,
+             "discount": 0,
+             "insurance": 0,
+             "internationalShippingCost": 45882.85,
+             "vat": 4989.76,
+             "amount": 66530.13,
+             "currencySymbol": "\u20a6",
+             "logisticCompany": 2,
+             "logisticsCompanyMap": "DHL",
+             "shipmentMethod": 1,
+             "estimatedDeliveryDateAndTime": "2026-07-03T23:59:00"
+            }
+           ]
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postIntlshipmentInboundPrice"
+       },
+       "example": {
+        "SenderDetails": {
+         "DepartureCountryId": 62,
+         "DepartureServiceCentreId": 370
+        },
+        "ReceiverDetails": {
+         "ReceiverAddress": "16 Ikorodu Road, Ojota, Lagos 101233",
+         "ReceiverState": "Lagos",
+         "ReceiverCountry": "Nigeria"
+        },
+        "DeclaredValue": 1000,
+        "ShipmentItems": [
+         {
+          "InternationalShipmentItemType": 1,
+          "Quantity": 1
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/intlShipment/inbound/create": {
+   "post": {
+    "tags": [
+     "International Shipment"
+    ],
+    "summary": "Create an inbound shipment to Nigeria",
+    "description": "Create an inbound shipment from the UK (62), USA (207), or China (43) to Nigeria. China Shop For Me is not supported by this endpoint.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "requestNumber": "REQ-123456"
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/postIntlshipmentInboundCreate"
+       },
+       "example": {
+        "SenderDetails": {
+         "DepartureCountryId": 62,
+         "DepartureServiceCentreId": 370
+        },
+        "ShipmentDetails": {
+         "Consolidated": false
+        },
+        "ReceiverDetails": {
+         "ReceiverName": "John Doe",
+         "ReceiverPhoneNumber": "08012345678",
+         "ReceiverAddress": "12 Allen Avenue, Ikeja",
+         "ReceiverState": "Lagos",
+         "ReceiverCountry": "Nigeria"
+        },
+        "IntlShipmentRequestItems": [
+         {
+          "CategoryId": 1,
+          "ItemName": "Shoes",
+          "StoreName": "Amazon UK",
+          "TrackingId": "UK123456789",
+          "ItemValue": 150,
+          "Quantity": 1,
+          "Description": "A pair of shoes"
+         }
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "/intlShipment/inbound/history": {
+   "get": {
+    "tags": [
+     "International Shipment"
+    ],
+    "summary": "Get inbound shipment history",
+    "description": "Get the authenticated user's inbound shipment requests. A populated waybill and isProcessed=true indicate that a request has been processed.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "historyData": [
+             {
+              "requestNumber": "REQ-104200011",
+              "waybill": null,
+              "isProcessed": false,
+              "paymentStatus": 0
+             },
+             {
+              "requestNumber": "REQ-104200010",
+              "waybill": "1356000250",
+              "isProcessed": true,
+              "paymentStatus": 1
+             }
+            ],
+            "count": 2
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "EndDate",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "StartDate",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "oneOf": [
+        {
+         "x-required": true
+        },
+        {}
+       ]
+      }
+     },
+     {
+      "name": "Skip",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "number",
+       "format": "float"
+      }
+     },
+     {
+      "name": "Limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "number",
+       "format": "float"
+      }
+     },
+     {
+      "name": "IsProcessed",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean"
+      }
+     },
+     {
+      "name": "Search",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  },
+  "/intlShipment/inbound/details": {
+   "get": {
+    "tags": [
+     "International Shipment"
+    ],
+    "summary": "Get inbound shipment details",
+    "description": "Get one inbound shipment using either RequestNumber or Waybill. Supply exactly one of the two query parameters.",
+    "responses": {
+     "200": {
+      "description": "Successful response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "successResponse": {
+          "value": {
+           "success": true,
+           "data": {
+            "requestNumber": "REQ-104200010",
+            "waybill": "1356000250",
+            "isProcessed": true,
+            "paymentStatus": 1,
+            "grandTotal": 71519.89,
+            "items": []
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Bad request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 400,
+           "message": "Invalid request payload",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Unauthorized request",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "badRequest": {
+          "value": {
+           "status": 401,
+           "message": "Wrong authentication credentials",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     },
+     "500": {
+      "description": "Internal server error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/GenericResponse"
+        },
+        "examples": {
+         "serverError": {
+          "value": {
+           "status": 500,
+           "message": "Server error occurred",
+           "apiId": "",
+           "data": {}
+          }
+         }
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "access-token": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "RequestNumber",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "Waybill",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ]
+   }
+  }
+ },
+ "components": {
+  "securitySchemes": {
+   "access-token": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "access-token"
+   }
+  },
+  "schemas": {
+   "GenericResponse": {
+    "type": "object",
+    "properties": {
+     "message": {
+      "type": "string",
+      "description": "Error message or Success message"
+     },
+     "apiId": {
+      "type": "string",
+      "description": "Unique API reference ID for tracking"
+     },
+     "status": {
+      "type": "number",
+      "description": "HTTP status code of the response"
+     },
+     "data": {
+      "type": "object",
+      "description": "Response payload"
+     }
+    },
+    "additionalProperties": false
+   },
+   "VEHICLE_TYPE": {
+    "type": "integer",
+    "enum": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "description": "Car = 0,\nBike = 1,\nVan = 2,\nTruck = 3"
+   },
+   "PICKUP_OPTION": {
+    "type": "integer",
+    "enum": [
+     0,
+     1
+    ],
+    "description": "HomeDelivery = 0,\nServiceCentre = 1"
+   },
+   "SHIPMENT_TYPE": {
+    "type": "integer",
+    "enum": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    "description": "Special = 0,\nRegular = 1,\nEcommerce = 2,\nStore = 3,\nHaulage = 4"
+   },
+   "DELIVERY_TYPE": {
+    "type": "integer",
+    "enum": [
+     0,
+     1
+    ],
+    "description": "GOSTANDARDED = 0,\nGOFASTER = 1"
+   },
+   "CUSTOMER_TYPE": {
+    "type": "integer",
+    "enum": [
+     0,
+     1,
+     2
+    ],
+    "description": "Company = 0,\nIndividualCustomer = 1,\nPartner = 2"
+   },
+   "RANK": {
+    "type": "integer",
+    "enum": [
+     0,
+     1
+    ],
+    "description": "Basic = 0,\nClass = 1"
+   },
+   "COMPANY_TYPE": {
+    "type": "integer",
+    "enum": [
+     0,
+     1,
+     2
+    ],
+    "description": "Corporate = 0,\nEcommerce = 1,\nClient = 2"
+   },
+   "COMPANY_STATUS": {
+    "type": "integer",
+    "enum": [
+     0,
+     1,
+     2
+    ],
+    "description": "Suspended = 0,\nActive = 1,\nPending = 2"
+   },
+   "BILL_TYPE": {
+    "type": "integer",
+    "enum": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    "description": "CLASS_SUBSCRIPTION = 0,\nTV_SUB = 1,\nAIRTIME = 2,\nDATA_SUB = 3,\nELECTRICITY = 4"
+   },
+   "postLogin": {
+    "type": "object",
+    "properties": {
+     "email": {
+      "type": "string",
+      "format": "email"
+     },
+     "password": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "email",
+     "password"
+    ],
+    "additionalProperties": false
+   },
+   "postPrice": {
+    "type": "object",
+    "properties": {
+     "SenderStationId": {
+      "type": "number",
+      "format": "float"
+     },
+     "ReceiverStationId": {
+      "type": "number",
+      "format": "float"
+     },
+     "VehicleType": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       1,
+       3,
+       2
+      ]
+     },
+     "ReceiverLocation": {
+      "type": "object",
+      "properties": {
+       "Latitude": {
+        "type": "number",
+        "format": "float"
+       },
+       "Longitude": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "Latitude",
+       "Longitude"
+      ],
+      "additionalProperties": false
+     },
+     "SenderLocation": {
+      "type": "object",
+      "properties": {
+       "Latitude": {
+        "type": "number",
+        "format": "float"
+       },
+       "Longitude": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "Latitude",
+       "Longitude"
+      ],
+      "additionalProperties": false
+     },
+     "IsFromAgility": {
+      "type": "boolean"
+     },
+     "CustomerCode": {
+      "type": "string"
+     },
+     "CustomerType": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       0,
+       1
+      ]
+     },
+     "DeliveryOptionIds": {
+      "type": "array",
+      "items": {
+       "type": "number",
+       "format": "float"
+      }
+     },
+     "Value": {
+      "type": "number",
+      "format": "float"
+     },
+     "PickUpOptions": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       0,
+       1
+      ]
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Description": {
+         "type": "string"
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float",
+         "minimum": 1
+        },
+        "ShipmentType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          1,
+          0
+         ]
+        },
+        "ItemName": {
+         "type": "string",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "SpecialPackageId": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "IsVolumetric": {
+         "type": "boolean",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Length": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Width": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Height": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Value": {
+         "type": "number",
+         "format": "float"
+        }
+       },
+       "required": [
+        "Quantity",
+        "ShipmentType"
+       ],
+       "additionalProperties": false
+      }
+     }
+    },
+    "required": [
+     "SenderStationId",
+     "ReceiverStationId",
+     "ReceiverLocation",
+     "SenderLocation",
+     "CustomerCode",
+     "CustomerType",
+     "PickUpOptions",
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "postPriceV3": {
+    "type": "object",
+    "properties": {
+     "ReceiverAddress": {
+      "type": "string",
+      "maxLength": 500
+     },
+     "SenderAddress": {
+      "type": "string",
+      "maxLength": 500
+     },
+     "SenderStationId": {
+      "type": "number",
+      "format": "float"
+     },
+     "ReceiverStationId": {
+      "type": "number",
+      "format": "float"
+     },
+     "IsPriorityShipment": {
+      "type": "boolean"
+     },
+     "VehicleType": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       1,
+       3,
+       2,
+       0
+      ]
+     },
+     "ReceiverLocation": {
+      "type": "object",
+      "properties": {
+       "Latitude": {
+        "type": "number",
+        "format": "float"
+       },
+       "Longitude": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "Latitude",
+       "Longitude"
+      ],
+      "additionalProperties": false
+     },
+     "SenderLocation": {
+      "type": "object",
+      "properties": {
+       "Latitude": {
+        "type": "number",
+        "format": "float"
+       },
+       "Longitude": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "Latitude",
+       "Longitude"
+      ],
+      "additionalProperties": false
+     },
+     "PickUpOptions": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       0,
+       1
+      ]
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Description": {
+         "type": "string"
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float",
+         "minimum": 1
+        },
+        "ShipmentType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          1,
+          0
+         ]
+        },
+        "ItemName": {
+         "type": "string",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "SpecialPackageId": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "IsVolumetric": {
+         "type": "boolean",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Length": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Width": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Height": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Value": {
+         "type": "number",
+         "format": "float"
+        }
+       },
+       "required": [
+        "Quantity",
+        "ShipmentType"
+       ],
+       "additionalProperties": false
+      }
+     }
+    },
+    "required": [
+     "ReceiverLocation",
+     "SenderLocation",
+     "PickUpOptions",
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "postPriceBulk": {
+    "type": "object",
+    "properties": {
+     "ReceiverDetails": {
+      "type": "object",
+      "properties": {
+       "ReceiverStationId": {
+        "type": "number",
+        "format": "float"
+       },
+       "ReceiverLocation": {
+        "type": "object",
+        "properties": {
+         "Latitude": {
+          "type": "string"
+         },
+         "Longitude": {
+          "type": "string"
+         },
+         "FormattedAddress": {
+          "type": "string"
+         },
+         "Name": {
+          "type": "string"
+         },
+         "LGA": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "Latitude",
+         "Longitude"
+        ],
+        "additionalProperties": false
+       }
+      },
+      "required": [
+       "ReceiverStationId",
+       "ReceiverLocation"
+      ],
+      "additionalProperties": false
+     },
+     "Shipments": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Merchant": {
+         "type": "object",
+         "properties": {
+          "CustomerCode": {
+           "type": "string"
+          },
+          "CustomerType": {
+           "type": "number",
+           "format": "float"
+          },
+          "SenderStationId": {
+           "type": "number",
+           "format": "float"
+          },
+          "SenderLocation": {
+           "type": "object",
+           "properties": {
+            "Latitude": {
+             "type": "string"
+            },
+            "Longitude": {
+             "type": "string"
+            },
+            "FormattedAddress": {
+             "type": "string"
+            },
+            "Name": {
+             "type": "string"
+            },
+            "LGA": {
+             "type": "string"
+            }
+           },
+           "required": [
+            "Latitude",
+            "Longitude"
+           ],
+           "additionalProperties": false
+          }
+         },
+         "required": [
+          "CustomerCode",
+          "CustomerType",
+          "SenderStationId",
+          "SenderLocation"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentDetails": {
+         "type": "object",
+         "properties": {
+          "VehicleType": {
+           "type": "number",
+           "format": "float",
+           "enum": [
+            1,
+            3,
+            2,
+            0
+           ]
+          },
+          "IsFromAgility": {
+           "type": "number",
+           "format": "float"
+          },
+          "PickUpOptions": {
+           "type": "number",
+           "format": "float",
+           "enum": [
+            0,
+            1
+           ]
+          },
+          "IsBatchPickUp": {
+           "type": "number",
+           "format": "float"
+          }
+         },
+         "required": [
+          "VehicleType",
+          "PickUpOptions"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentItems": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "Description": {
+            "type": "string"
+           },
+           "Quantity": {
+            "type": "number",
+            "format": "float",
+            "minimum": 1
+           },
+           "ShipmentType": {
+            "type": "number",
+            "format": "float",
+            "enum": [
+             1,
+             0,
+             4
+            ]
+           },
+           "ItemName": {
+            "type": "string",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "SpecialPackageId": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Weight": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "IsVolumetric": {
+            "type": "boolean",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Length": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Width": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Height": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "HaulageId": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Value": {
+            "type": "number",
+            "format": "float"
+           }
+          },
+          "required": [
+           "Quantity",
+           "ShipmentType"
+          ],
+          "additionalProperties": false
+         },
+         "minItems": 1
+        }
+       },
+       "required": [
+        "Merchant",
+        "ShipmentItems"
+       ],
+       "additionalProperties": false
+      }
+     }
+    },
+    "additionalProperties": false
+   },
+   "postDropoffPrice": {
+    "type": "object",
+    "properties": {
+     "SenderStationId": {
+      "type": "number",
+      "format": "float"
+     },
+     "ReceiverStationId": {
+      "type": "number",
+      "format": "float"
+     },
+     "DeliveryType": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       0,
+       1
+      ]
+     },
+     "PickUpOptions": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       0,
+       1
+      ]
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Description": {
+         "type": "string"
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float",
+         "minimum": 1
+        },
+        "ShipmentType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          1,
+          0
+         ]
+        },
+        "ItemName": {
+         "type": "string",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "SpecialPackageId": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "IsVolumetric": {
+         "type": "boolean",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Length": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Width": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Height": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Value": {
+         "type": "number",
+         "format": "float"
+        },
+        "Nature": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "Quantity",
+        "ShipmentType"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "SenderStationId",
+     "ReceiverStationId",
+     "DeliveryType",
+     "PickUpOptions",
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "postDropoffPriceBulk": {
+    "type": "object",
+    "properties": {
+     "Shipments": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "SenderStationId": {
+         "type": "number",
+         "format": "float"
+        },
+        "ReceiverStationId": {
+         "type": "number",
+         "format": "float"
+        },
+        "DeliveryType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          0,
+          1
+         ]
+        },
+        "PickUpOptions": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          0,
+          1
+         ]
+        },
+        "ShipmentItems": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "Description": {
+            "type": "string"
+           },
+           "Quantity": {
+            "type": "number",
+            "format": "float",
+            "minimum": 1
+           },
+           "ShipmentType": {
+            "type": "number",
+            "format": "float",
+            "enum": [
+             1,
+             0
+            ]
+           },
+           "ItemName": {
+            "type": "string",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "SpecialPackageId": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Weight": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "IsVolumetric": {
+            "type": "boolean",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Length": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Width": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Height": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Value": {
+            "type": "number",
+            "format": "float"
+           },
+           "Nature": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "Quantity",
+           "ShipmentType"
+          ],
+          "additionalProperties": false
+         },
+         "minItems": 1
+        }
+       },
+       "required": [
+        "SenderStationId",
+        "ReceiverStationId",
+        "DeliveryType",
+        "PickUpOptions",
+        "ShipmentItems"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "Shipments"
+    ],
+    "additionalProperties": false
+   },
+   "postCapturePreshipmentShein": {
+    "type": "object",
+    "properties": {
+     "fetchOption": {
+      "anyOf": [
+       {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         1,
+         2
+        ]
+       },
+       {
+        "type": "string",
+        "enum": [
+         ""
+        ]
+       }
+      ]
+     },
+     "Waybill": {
+      "type": "string"
+     },
+     "SenderDetails": {
+      "type": "object",
+      "properties": {
+       "SenderName": {
+        "type": "string"
+       },
+       "SenderPhoneNumber": {
+        "type": "string"
+       },
+       "SenderStationId": {
+        "type": "number",
+        "format": "float"
+       },
+       "SenderAddress": {
+        "type": "string",
+        "maxLength": 500
+       },
+       "InputtedSenderAddress": {
+        "type": "string"
+       },
+       "SenderLocality": {
+        "type": "string"
+       },
+       "SenderLocation": {
+        "type": "object",
+        "properties": {
+         "Latitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "Longitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "FormattedAddress": {
+          "type": "string"
+         },
+         "Name": {
+          "type": "string"
+         },
+         "LGA": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "Latitude",
+         "Longitude"
+        ],
+        "additionalProperties": false
+       }
+      },
+      "required": [
+       "SenderName",
+       "SenderPhoneNumber",
+       "SenderAddress",
+       "InputtedSenderAddress",
+       "SenderLocality",
+       "SenderLocation"
+      ],
+      "additionalProperties": false
+     },
+     "ReceiverDetails": {
+      "type": "object",
+      "properties": {
+       "ReceiverStationId": {
+        "type": "number",
+        "format": "float"
+       },
+       "ReceiverName": {
+        "type": "string"
+       },
+       "ReceiverPhoneNumber": {
+        "type": "string"
+       },
+       "ReceiverAddress": {
+        "type": "string",
+        "maxLength": 500
+       },
+       "InputtedReceiverAddress": {
+        "type": "string"
+       },
+       "ReceiverLocation": {
+        "type": "object",
+        "properties": {
+         "Latitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "Longitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "FormattedAddress": {
+          "type": "string"
+         },
+         "Name": {
+          "type": "string"
+         },
+         "LGA": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "Latitude",
+         "Longitude"
+        ],
+        "additionalProperties": false
+       },
+       "DestinationServiceCenterId": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "ReceiverName",
+       "ReceiverPhoneNumber",
+       "ReceiverAddress",
+       "InputtedReceiverAddress",
+       "ReceiverLocation"
+      ],
+      "additionalProperties": false
+     },
+     "ShipmentDetails": {
+      "type": "object",
+      "properties": {
+       "VehicleType": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         1,
+         3,
+         2,
+         0
+        ]
+       },
+       "IsPriorityShipment": {
+        "type": "boolean"
+       },
+       "PricingStrategy": {
+        "type": "number",
+        "format": "float"
+       },
+       "IsFromAgility": {
+        "type": "number",
+        "format": "float"
+       },
+       "IsBatchPickUp": {
+        "type": "number",
+        "format": "float"
+       },
+       "IsCashOnDelivery": {
+        "type": "boolean"
+       },
+       "PickUpOptions": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         0,
+         1
+        ]
+       },
+       "CashOnDeliveryAmount": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "VehicleType"
+      ],
+      "additionalProperties": false
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "ItemName": {
+         "type": "string",
+         "maxLength": 100
+        },
+        "Description": {
+         "type": "string",
+         "maxLength": 500
+        },
+        "ShipmentType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          0,
+          1,
+          4
+         ]
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float",
+         "minimum": 1
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "minimum": 0
+        },
+        "IsVolumetric": {
+         "type": "boolean"
+        },
+        "Length": {
+         "type": "number",
+         "format": "float"
+        },
+        "Width": {
+         "type": "number",
+         "format": "float"
+        },
+        "Height": {
+         "type": "number",
+         "format": "float"
+        },
+        "SpecialPackageId": {
+         "type": "number",
+         "format": "float"
+        },
+        "HaulageId": {
+         "type": "number",
+         "format": "float"
+        },
+        "Value": {
+         "type": "number",
+         "format": "float"
+        }
+       },
+       "required": [
+        "ShipmentType",
+        "Quantity"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "SenderDetails",
+     "ReceiverDetails",
+     "ShipmentDetails",
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "postCapturePreshipment": {
+    "type": "object",
+    "properties": {
+     "SenderDetails": {
+      "type": "object",
+      "properties": {
+       "SenderName": {
+        "type": "string"
+       },
+       "SenderPhoneNumber": {
+        "type": "string"
+       },
+       "SenderStationId": {
+        "type": "number",
+        "format": "float"
+       },
+       "SenderAddress": {
+        "type": "string",
+        "maxLength": 500
+       },
+       "InputtedSenderAddress": {
+        "type": "string"
+       },
+       "SenderLocality": {
+        "type": "string"
+       },
+       "SenderLocation": {
+        "type": "object",
+        "properties": {
+         "Latitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "Longitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "FormattedAddress": {
+          "type": "string"
+         },
+         "Name": {
+          "type": "string"
+         },
+         "LGA": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "Latitude",
+         "Longitude"
+        ],
+        "additionalProperties": false
+       }
+      },
+      "required": [
+       "SenderName",
+       "SenderPhoneNumber",
+       "SenderAddress",
+       "InputtedSenderAddress",
+       "SenderLocality",
+       "SenderLocation"
+      ],
+      "additionalProperties": false
+     },
+     "ReceiverDetails": {
+      "type": "object",
+      "properties": {
+       "ReceiverStationId": {
+        "type": "number",
+        "format": "float"
+       },
+       "ReceiverName": {
+        "type": "string"
+       },
+       "ReceiverPhoneNumber": {
+        "type": "string"
+       },
+       "ReceiverAddress": {
+        "type": "string",
+        "maxLength": 500
+       },
+       "InputtedReceiverAddress": {
+        "type": "string"
+       },
+       "ReceiverLocation": {
+        "type": "object",
+        "properties": {
+         "Latitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "Longitude": {
+          "type": "number",
+          "format": "float"
+         },
+         "FormattedAddress": {
+          "type": "string"
+         },
+         "Name": {
+          "type": "string"
+         },
+         "LGA": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "Latitude",
+         "Longitude"
+        ],
+        "additionalProperties": false
+       },
+       "DestinationServiceCenterId": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "ReceiverName",
+       "ReceiverPhoneNumber",
+       "ReceiverAddress",
+       "InputtedReceiverAddress",
+       "ReceiverLocation"
+      ],
+      "additionalProperties": false
+     },
+     "ShipmentDetails": {
+      "type": "object",
+      "properties": {
+       "VehicleType": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         1,
+         3,
+         2,
+         0
+        ]
+       },
+       "IsPriorityShipment": {
+        "type": "boolean"
+       },
+       "PricingStrategy": {
+        "type": "number",
+        "format": "float"
+       },
+       "IsFromAgility": {
+        "type": "number",
+        "format": "float"
+       },
+       "IsBatchPickUp": {
+        "type": "number",
+        "format": "float"
+       },
+       "IsCashOnDelivery": {
+        "type": "boolean"
+       },
+       "CashOnDeliveryAmount": {
+        "type": "number",
+        "format": "float",
+        "oneOf": [
+         {
+          "x-required": true
+         },
+         {}
+        ]
+       },
+       "PickUpOptions": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         0,
+         1
+        ]
+       }
+      },
+      "required": [
+       "VehicleType"
+      ],
+      "additionalProperties": false
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Description": {
+         "type": "string"
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float",
+         "minimum": 1
+        },
+        "ShipmentType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          1,
+          0,
+          4
+         ]
+        },
+        "ItemName": {
+         "type": "string",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "SpecialPackageId": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "IsVolumetric": {
+         "type": "boolean",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Length": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Width": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Height": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "HaulageId": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Value": {
+         "type": "number",
+         "format": "float"
+        }
+       },
+       "required": [
+        "Quantity",
+        "ShipmentType"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     },
+     "fetchOption": {
+      "anyOf": [
+       {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         1,
+         2
+        ]
+       },
+       {
+        "type": "string",
+        "enum": [
+         ""
+        ]
+       }
+      ]
+     }
+    },
+    "required": [
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "getGetPreshipment": {
+    "type": "object",
+    "properties": {
+     "Waybill": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "Waybill"
+    ],
+    "additionalProperties": false
+   },
+   "getTrackMobileshipment": {
+    "type": "object",
+    "properties": {
+     "Waybill": {
+      "type": "string"
+     },
+     "fetchOption": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       1,
+       2
+      ]
+     }
+    },
+    "required": [
+     "Waybill"
+    ],
+    "additionalProperties": false
+   },
+   "postTrackMultiplemobileshipment": {
+    "type": "object",
+    "properties": {
+     "Waybill": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "minItems": 1
+     },
+     "fetchOption": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       1,
+       2
+      ]
+     }
+    },
+    "required": [
+     "Waybill"
+    ],
+    "additionalProperties": false
+   },
+   "postCaptureBulkPreshipment": {
+    "type": "object",
+    "properties": {
+     "ReceiverDetails": {
+      "type": "object",
+      "properties": {
+       "ReceiverStationId": {
+        "type": "number",
+        "format": "float"
+       },
+       "ReceiverName": {
+        "type": "string"
+       },
+       "ReceiverPhoneNumber": {
+        "type": "string"
+       },
+       "ReceiverAddress": {
+        "type": "string",
+        "maxLength": 500
+       },
+       "InputtedReceiverAddress": {
+        "type": "string"
+       },
+       "ReceiverLocation": {
+        "type": "object",
+        "properties": {
+         "Latitude": {
+          "type": "string"
+         },
+         "Longitude": {
+          "type": "string"
+         },
+         "FormattedAddress": {
+          "type": "string"
+         },
+         "Name": {
+          "type": "string"
+         },
+         "LGA": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "Latitude",
+         "Longitude"
+        ],
+        "additionalProperties": false
+       },
+       "DestinationServiceCenterId": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "ReceiverStationId",
+       "ReceiverName",
+       "ReceiverPhoneNumber",
+       "ReceiverAddress",
+       "InputtedReceiverAddress",
+       "ReceiverLocation"
+      ],
+      "additionalProperties": false
+     },
+     "Shipments": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Merchant": {
+         "type": "object",
+         "properties": {
+          "SenderName": {
+           "type": "string"
+          },
+          "CustomerCode": {
+           "type": "string"
+          },
+          "SenderPhoneNumber": {
+           "type": "string"
+          },
+          "SenderStationId": {
+           "type": "number",
+           "format": "float"
+          },
+          "SenderAddress": {
+           "type": "string",
+           "maxLength": 500
+          },
+          "InputtedSenderAddress": {
+           "type": "string"
+          },
+          "SenderLocality": {
+           "type": "string"
+          },
+          "SenderLocation": {
+           "type": "object",
+           "properties": {
+            "Latitude": {
+             "type": "string"
+            },
+            "Longitude": {
+             "type": "string"
+            },
+            "FormattedAddress": {
+             "type": "string"
+            },
+            "Name": {
+             "type": "string"
+            },
+            "LGA": {
+             "type": "string"
+            }
+           },
+           "required": [
+            "Latitude",
+            "Longitude"
+           ],
+           "additionalProperties": false
+          }
+         },
+         "required": [
+          "SenderName",
+          "CustomerCode",
+          "SenderPhoneNumber",
+          "SenderStationId",
+          "SenderAddress",
+          "InputtedSenderAddress",
+          "SenderLocality",
+          "SenderLocation"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentDetails": {
+         "type": "object",
+         "properties": {
+          "VehicleType": {
+           "type": "number",
+           "format": "float",
+           "enum": [
+            1,
+            3,
+            2,
+            0
+           ]
+          },
+          "IsFromAgility": {
+           "type": "number",
+           "format": "float"
+          },
+          "IsBatchPickUp": {
+           "type": "number",
+           "format": "float"
+          },
+          "IsCashOnDelivery": {
+           "type": "boolean"
+          },
+          "CashOnDeliveryAmount": {
+           "type": "number",
+           "format": "float",
+           "oneOf": [
+            {
+             "x-required": true
+            },
+            {}
+           ]
+          }
+         },
+         "required": [
+          "VehicleType"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentItems": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "Description": {
+            "type": "string"
+           },
+           "Quantity": {
+            "type": "number",
+            "format": "float",
+            "minimum": 1
+           },
+           "ShipmentType": {
+            "type": "number",
+            "format": "float",
+            "enum": [
+             1,
+             0,
+             4
+            ]
+           },
+           "ItemName": {
+            "type": "string",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "SpecialPackageId": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Weight": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "IsVolumetric": {
+            "type": "boolean",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Length": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Width": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Height": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "HaulageId": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Value": {
+            "type": "number",
+            "format": "float"
+           }
+          },
+          "required": [
+           "Quantity",
+           "ShipmentType"
+          ],
+          "additionalProperties": false
+         },
+         "minItems": 1
+        }
+       },
+       "required": [
+        "ShipmentItems"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     },
+     "fetchOption": {
+      "anyOf": [
+       {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         1,
+         2
+        ]
+       },
+       {
+        "type": "string",
+        "enum": [
+         ""
+        ]
+       }
+      ]
+     }
+    },
+    "required": [
+     "Shipments"
+    ],
+    "additionalProperties": false
+   },
+   "getLocalstationsGet": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+   },
+   "getInternationalstationsGet": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+   },
+   "getServicecentresbystation": {
+    "type": "object",
+    "properties": {
+     "StationId": {
+      "type": "number",
+      "format": "float"
+     }
+    },
+    "required": [
+     "StationId"
+    ],
+    "additionalProperties": false
+   },
+   "getLgaActive": {
+    "type": "object",
+    "properties": {
+     "StateId": {
+      "type": "integer"
+     },
+     "Search": {
+      "type": "string"
+     },
+     "Limit": {
+      "type": "integer"
+     },
+     "Skip": {
+      "type": "integer"
+     }
+    },
+    "additionalProperties": false
+   },
+   "getCountryGet": {
+    "type": "object",
+    "properties": {
+     "CountryName": {
+      "type": "string"
+     }
+    },
+    "additionalProperties": false
+   },
+   "getHomedeliveryActive": {
+    "type": "object",
+    "properties": {
+     "StateId": {
+      "type": "integer"
+     },
+     "Search": {
+      "type": "string"
+     },
+     "Limit": {
+      "type": "integer"
+     },
+     "Skip": {
+      "type": "integer"
+     }
+    },
+    "additionalProperties": false
+   },
+   "getCompanydetailsGet": {
+    "type": "object",
+    "properties": {
+     "Email": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "Email"
+    ],
+    "additionalProperties": false
+   },
+   "putChargewallet": {
+    "type": "object",
+    "properties": {
+     "UserId": {
+      "type": "string"
+     },
+     "Amount": {
+      "type": "number",
+      "format": "float",
+      "minimum": 1
+     },
+     "BillType": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       0,
+       1,
+       2,
+       4
+      ]
+     },
+     "Description": {
+      "type": "string"
+     },
+     "ReferenceNo": {
+      "type": "string",
+      "oneOf": [
+       {
+        "x-required": true
+       },
+       {}
+      ]
+     }
+    },
+    "required": [
+     "UserId",
+     "Amount",
+     "BillType",
+     "Description"
+    ],
+    "additionalProperties": false
+   },
+   "postInvoiceGenerate": {
+    "type": "object",
+    "properties": {
+     "Waybill": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "Waybill"
+    ],
+    "additionalProperties": false
+   },
+   "postCreateDropoff": {
+    "type": "object",
+    "properties": {
+     "TempCode": {
+      "type": "string"
+     },
+     "SenderDetails": {
+      "type": "object",
+      "properties": {
+       "SenderName": {
+        "type": "string"
+       },
+       "SenderPhoneNumber": {
+        "type": "string"
+       },
+       "SenderCity": {
+        "type": "string"
+       },
+       "DepartureStationId": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "DepartureStationId"
+      ],
+      "additionalProperties": false
+     },
+     "ShipmentDetails": {
+      "type": "object",
+      "properties": {
+       "DeliveryType": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         0,
+         1
+        ]
+       },
+       "PickupOptions": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         0,
+         1
+        ]
+       },
+       "IsCashOnDelivery": {
+        "type": "number",
+        "format": "float"
+       },
+       "CashOnDeliveryAmount": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "DeliveryType",
+       "PickupOptions"
+      ],
+      "additionalProperties": false
+     },
+     "ReceiverDetails": {
+      "type": "object",
+      "properties": {
+       "ReceiverName": {
+        "type": "string"
+       },
+       "ReceiverPhoneNumber": {
+        "type": "string"
+       },
+       "ReceiverAddress": {
+        "type": "string"
+       },
+       "ReceiverCity": {
+        "type": "string"
+       },
+       "DestinationStationId": {
+        "type": "number",
+        "format": "float"
+       },
+       "DestinationServiceCenterId": {
+        "type": "number",
+        "format": "float",
+        "oneOf": [
+         {},
+         {
+          "x-required": true
+         }
+        ]
+       }
+      },
+      "required": [
+       "ReceiverName",
+       "ReceiverPhoneNumber",
+       "ReceiverAddress",
+       "DestinationStationId"
+      ],
+      "additionalProperties": false
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Description": {
+         "type": "string"
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float",
+         "minimum": 1
+        },
+        "ShipmentType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          1,
+          0
+         ]
+        },
+        "ItemName": {
+         "type": "string",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "SpecialPackageId": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "IsVolumetric": {
+         "type": "boolean",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Length": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Width": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Height": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Value": {
+         "type": "number",
+         "format": "float"
+        },
+        "Nature": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "Quantity",
+        "ShipmentType"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "SenderDetails",
+     "ShipmentDetails",
+     "ReceiverDetails",
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "postCreateDropoffBulk": {
+    "type": "object",
+    "properties": {
+     "Shipments": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "TempCode": {
+         "type": "string"
+        },
+        "SenderDetails": {
+         "type": "object",
+         "properties": {
+          "SenderName": {
+           "type": "string"
+          },
+          "SenderPhoneNumber": {
+           "type": "string"
+          },
+          "SenderCity": {
+           "type": "string"
+          },
+          "DepartureStationId": {
+           "type": "number",
+           "format": "float"
+          }
+         },
+         "required": [
+          "DepartureStationId"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentDetails": {
+         "type": "object",
+         "properties": {
+          "DeliveryType": {
+           "type": "number",
+           "format": "float",
+           "enum": [
+            0,
+            1
+           ]
+          },
+          "PickupOptions": {
+           "type": "number",
+           "format": "float",
+           "enum": [
+            0,
+            1
+           ]
+          },
+          "IsCashOnDelivery": {
+           "type": "number",
+           "format": "float"
+          },
+          "CashOnDeliveryAmount": {
+           "type": "number",
+           "format": "float"
+          }
+         },
+         "required": [
+          "DeliveryType",
+          "PickupOptions"
+         ],
+         "additionalProperties": false
+        },
+        "ReceiverDetails": {
+         "type": "object",
+         "properties": {
+          "ReceiverName": {
+           "type": "string"
+          },
+          "ReceiverPhoneNumber": {
+           "type": "string"
+          },
+          "ReceiverAddress": {
+           "type": "string"
+          },
+          "ReceiverCity": {
+           "type": "string"
+          },
+          "DestinationStationId": {
+           "type": "number",
+           "format": "float"
+          },
+          "DestinationServiceCenterId": {
+           "type": "number",
+           "format": "float",
+           "oneOf": [
+            {},
+            {
+             "x-required": true
+            }
+           ]
+          }
+         },
+         "required": [
+          "ReceiverName",
+          "ReceiverPhoneNumber",
+          "ReceiverAddress",
+          "DestinationStationId"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentItems": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "Description": {
+            "type": "string"
+           },
+           "Quantity": {
+            "type": "number",
+            "format": "float",
+            "minimum": 1
+           },
+           "ShipmentType": {
+            "type": "number",
+            "format": "float",
+            "enum": [
+             1,
+             0
+            ]
+           },
+           "ItemName": {
+            "type": "string",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "SpecialPackageId": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Weight": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "IsVolumetric": {
+            "type": "boolean",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Length": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Width": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Height": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Value": {
+            "type": "number",
+            "format": "float"
+           },
+           "Nature": {
+            "type": "string"
+           }
+          },
+          "required": [
+           "Quantity",
+           "ShipmentType"
+          ],
+          "additionalProperties": false
+         },
+         "minItems": 1
+        }
+       },
+       "required": [
+        "SenderDetails",
+        "ShipmentDetails",
+        "ReceiverDetails",
+        "ShipmentItems"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "Shipments"
+    ],
+    "additionalProperties": false
+   },
+   "postIntlshipmentPrice": {
+    "type": "object",
+    "properties": {
+     "IsVacuumSeal": {
+      "type": "boolean"
+     },
+     "IsPhytosanitaryCertification": {
+      "type": "boolean"
+     },
+     "DestinationCountryId": {
+      "type": "number",
+      "format": "float"
+     },
+     "ReceiverCity": {
+      "type": "string"
+     },
+     "ReceiverAddress": {
+      "type": "string",
+      "maxLength": 100
+     },
+     "ReceiverPostalCode": {
+      "type": "string"
+     },
+     "ReceiverCountryCode": {
+      "type": "string"
+     },
+     "ReceiverCountry": {
+      "type": "string"
+     },
+     "ReceiverStateOrProvinceCode": {
+      "type": "string"
+     },
+     "PickupOptions": {
+      "type": "number",
+      "format": "float",
+      "enum": [
+       0,
+       1
+      ]
+     },
+     "DeclaredValue": {
+      "type": "number",
+      "format": "float"
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "InternationalShipmentItemType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          0,
+          1
+         ]
+        },
+        "Description": {
+         "type": "string"
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float"
+        },
+        "Nature": {
+         "type": "number",
+         "format": "float"
+        },
+        "IsVolumetric": {
+         "type": "boolean",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Length": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Width": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Height": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "PackagingType": {
+         "type": "integer"
+        },
+        "Value": {
+         "type": "number",
+         "format": "float"
+        },
+        "HSCode": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "InternationalShipmentItemType",
+        "Quantity",
+        "Value"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     },
+     "ShipmentPackages": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "ShipmentPackageId": {
+         "type": "number",
+         "format": "float",
+         "nullable": true
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float"
+        },
+        "Length": {
+         "type": "number",
+         "format": "float"
+        },
+        "Width": {
+         "type": "number",
+         "format": "float"
+        },
+        "Height": {
+         "type": "number",
+         "format": "float"
+        }
+       },
+       "required": [
+        "Weight",
+        "Length",
+        "Width",
+        "Height"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "ReceiverCity",
+     "ReceiverCountryCode",
+     "ReceiverCountry",
+     "PickupOptions",
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "postIntlshipmentCreate": {
+    "type": "object",
+    "properties": {
+     "Shipments": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "Receiver": {
+         "type": "object",
+         "properties": {
+          "ReceiverName": {
+           "type": "string"
+          },
+          "ReceiverPhoneNumber": {
+           "type": "string"
+          },
+          "ReceiverAltPhoneNumber": {
+           "type": "string"
+          },
+          "ReceiverEmail": {
+           "type": "string",
+           "format": "email"
+          },
+          "ReceiverCompanyName": {
+           "type": "string"
+          },
+          "ReceiverCity": {
+           "type": "string"
+          },
+          "ReceiverAddress": {
+           "type": "string",
+           "maxLength": 300
+          },
+          "ReceiverState": {
+           "type": "string"
+          },
+          "ReceiverPostalCode": {
+           "type": "string"
+          },
+          "ReceiverCountryCode": {
+           "type": "string"
+          },
+          "ReceiverCountry": {
+           "type": "string"
+          },
+          "ReceiverStateOrProvinceCode": {
+           "type": "string"
+          },
+          "CashOnDeliveryAmount": {
+           "type": "number",
+           "format": "float"
+          }
+         },
+         "required": [
+          "ReceiverName",
+          "ReceiverPhoneNumber",
+          "ReceiverAltPhoneNumber",
+          "ReceiverCity",
+          "ReceiverAddress",
+          "ReceiverState",
+          "ReceiverPostalCode",
+          "ReceiverCountryCode",
+          "ReceiverCountry",
+          "ReceiverStateOrProvinceCode"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentItems": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "InternationalShipmentItemType": {
+            "type": "number",
+            "format": "float",
+            "enum": [
+             0,
+             1
+            ]
+           },
+           "Description": {
+            "type": "string"
+           },
+           "Weight": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "IsHighValue": {
+            "type": "boolean"
+           },
+           "Quantity": {
+            "type": "number",
+            "format": "float"
+           },
+           "Nature": {
+            "type": "number",
+            "format": "float"
+           },
+           "IsVolumetric": {
+            "type": "boolean",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Length": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Width": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "Height": {
+            "type": "number",
+            "format": "float",
+            "oneOf": [
+             {
+              "x-required": true
+             },
+             {}
+            ]
+           },
+           "PackagingType": {
+            "type": "integer"
+           },
+           "Price": {
+            "type": "number",
+            "format": "float"
+           },
+           "HSCode": {
+            "type": "string"
+           },
+           "Value": {
+            "type": "number",
+            "format": "float"
+           }
+          },
+          "required": [
+           "InternationalShipmentItemType",
+           "Quantity"
+          ],
+          "additionalProperties": false
+         }
+        },
+        "ShipmentDetails": {
+         "type": "object",
+         "properties": {
+          "Description": {
+           "type": "string"
+          },
+          "ManufacturerCountry": {
+           "type": "string"
+          },
+          "DestinationCountryId": {
+           "type": "number",
+           "format": "float"
+          },
+          "PickupOptions": {
+           "type": "number",
+           "format": "float"
+          },
+          "DeclaredValue": {
+           "type": "number",
+           "format": "float"
+          },
+          "DeliveryType": {
+           "type": "number",
+           "format": "float"
+          },
+          "IsVacuumSeal": {
+           "type": "boolean"
+          },
+          "IsPhytosanitaryCertification": {
+           "type": "boolean"
+          },
+          "LogisticsCompany": {
+           "type": "number",
+           "format": "float"
+          },
+          "FedexPackagingType": {
+           "type": "number",
+           "format": "float"
+          },
+          "blackBookSerialNumber": {
+           "type": "string"
+          }
+         },
+         "required": [
+          "ManufacturerCountry",
+          "PickupOptions",
+          "DeliveryType",
+          "LogisticsCompany"
+         ],
+         "additionalProperties": false
+        },
+        "ShipmentPackages": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "ShipmentPackageId": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+           },
+           "Weight": {
+            "type": "number",
+            "format": "float"
+           },
+           "Length": {
+            "type": "number",
+            "format": "float"
+           },
+           "Width": {
+            "type": "number",
+            "format": "float"
+           },
+           "Height": {
+            "type": "number",
+            "format": "float"
+           }
+          },
+          "required": [
+           "Weight",
+           "Length",
+           "Width",
+           "Height"
+          ],
+          "additionalProperties": false
+         },
+         "minItems": 1
+        }
+       },
+       "required": [
+        "ShipmentItems",
+        "ShipmentDetails"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "Shipments"
+    ],
+    "additionalProperties": false
+   },
+   "postIntlshipmentInboundPrice": {
+    "type": "object",
+    "properties": {
+     "SenderDetails": {
+      "type": "object",
+      "properties": {
+       "DepartureCountryId": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         62,
+         207,
+         43
+        ]
+       },
+       "DepartureServiceCentreId": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "DepartureCountryId",
+       "DepartureServiceCentreId"
+      ],
+      "additionalProperties": false
+     },
+     "ReceiverDetails": {
+      "type": "object",
+      "properties": {
+       "ReceiverAddress": {
+        "type": "string"
+       },
+       "ReceiverState": {
+        "type": "string"
+       },
+       "ReceiverCountry": {
+        "type": "string",
+        "enum": [
+         "Nigeria"
+        ]
+       }
+      },
+      "required": [
+       "ReceiverAddress",
+       "ReceiverState",
+       "ReceiverCountry"
+      ],
+      "additionalProperties": false
+     },
+     "DeclaredValue": {
+      "type": "number",
+      "format": "float"
+     },
+     "ShipmentItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "InternationalShipmentItemType": {
+         "type": "number",
+         "format": "float",
+         "enum": [
+          0,
+          1
+         ]
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float"
+        },
+        "Weight": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Length": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Width": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        },
+        "Height": {
+         "type": "number",
+         "format": "float",
+         "oneOf": [
+          {
+           "x-required": true
+          },
+          {}
+         ]
+        }
+       },
+       "required": [
+        "InternationalShipmentItemType",
+        "Quantity"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 10
+     }
+    },
+    "required": [
+     "SenderDetails",
+     "ReceiverDetails",
+     "DeclaredValue",
+     "ShipmentItems"
+    ],
+    "additionalProperties": false
+   },
+   "postIntlshipmentInboundCreate": {
+    "type": "object",
+    "properties": {
+     "SenderDetails": {
+      "type": "object",
+      "properties": {
+       "DepartureCountryId": {
+        "type": "number",
+        "format": "float",
+        "enum": [
+         62,
+         207,
+         43
+        ]
+       },
+       "DepartureServiceCentreId": {
+        "type": "number",
+        "format": "float"
+       }
+      },
+      "required": [
+       "DepartureCountryId",
+       "DepartureServiceCentreId"
+      ],
+      "additionalProperties": false
+     },
+     "ShipmentDetails": {
+      "type": "object",
+      "properties": {
+       "Consolidated": {
+        "type": "boolean"
+       }
+      },
+      "required": [
+       "Consolidated"
+      ],
+      "additionalProperties": false
+     },
+     "ReceiverDetails": {
+      "type": "object",
+      "properties": {
+       "ReceiverName": {
+        "type": "string"
+       },
+       "ReceiverPhoneNumber": {
+        "type": "string"
+       },
+       "ReceiverAddress": {
+        "type": "string"
+       },
+       "ReceiverState": {
+        "type": "string"
+       },
+       "ReceiverCountry": {
+        "type": "string",
+        "enum": [
+         "Nigeria"
+        ]
+       }
+      },
+      "required": [
+       "ReceiverName",
+       "ReceiverPhoneNumber",
+       "ReceiverAddress",
+       "ReceiverState",
+       "ReceiverCountry"
+      ],
+      "additionalProperties": false
+     },
+     "IntlShipmentRequestItems": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "CategoryId": {
+         "type": "number",
+         "format": "float"
+        },
+        "ItemName": {
+         "type": "string"
+        },
+        "StoreName": {
+         "type": "string"
+        },
+        "TrackingId": {
+         "type": "string"
+        },
+        "ItemValue": {
+         "type": "number",
+         "format": "float"
+        },
+        "Quantity": {
+         "type": "number",
+         "format": "float"
+        },
+        "Description": {
+         "type": "string"
+        }
+       },
+       "required": [
+        "CategoryId",
+        "ItemName",
+        "StoreName",
+        "TrackingId",
+        "ItemValue",
+        "Quantity"
+       ],
+       "additionalProperties": false
+      },
+      "minItems": 1
+     }
+    },
+    "required": [
+     "SenderDetails",
+     "ShipmentDetails",
+     "ReceiverDetails",
+     "IntlShipmentRequestItems"
+    ],
+    "additionalProperties": false
+   },
+   "getIntlshipmentInboundHistory": {
+    "type": "object",
+    "properties": {
+     "EndDate": {
+      "type": "string"
+     },
+     "StartDate": {
+      "type": "string",
+      "oneOf": [
+       {
+        "x-required": true
+       },
+       {}
+      ]
+     },
+     "Skip": {
+      "type": "number",
+      "format": "float"
+     },
+     "Limit": {
+      "type": "number",
+      "format": "float"
+     },
+     "IsProcessed": {
+      "type": "boolean"
+     },
+     "Search": {
+      "type": "string"
+     }
+    },
+    "additionalProperties": false
+   },
+   "getIntlshipmentInboundDetails": {
+    "type": "object",
+    "properties": {
+     "RequestNumber": {
+      "type": "string"
+     },
+     "Waybill": {
+      "type": "string"
+     }
+    },
+    "additionalProperties": false
+   }
+  }
+ }
+}

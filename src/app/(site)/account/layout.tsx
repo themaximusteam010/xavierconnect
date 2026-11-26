@@ -19,6 +19,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
             items={[
               { href: "/account", label: "Overview" },
               { href: "/account/orders", label: "Orders" },
+              { href: "/account/shipments", label: "Shipping & tracking" },
               { href: "/account/messages", label: "Messages", badge: messages.customer },
               { href: "/account/bookings", label: "Bookings" },
               { href: "/account/downloads", label: "Downloads" },

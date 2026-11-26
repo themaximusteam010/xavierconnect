@@ -726,16 +726,19 @@ model VendorOrder {
   settlementCurrency String            @default("NGN")
   processingFeeMinor BigInt            @default(0)
   settledAt          DateTime? // when earnings moved pending -> available
+  shippingQuoteId    String? // carrier quote the customer chose at checkout (null = seller-configured rate)
+  shippingCostMinor  BigInt? // what the carrier quoted XavierConnect (excl. markup)
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
 
-  order     Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  vendor    Vendor             @relation(fields: [vendorId], references: [id])
-  items     OrderItem[]
-  shipments Shipment[]
-  refunds   Refund[]
-  disputes  Dispute[]
-  events    VendorOrderEvent[]
+  order           Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  vendor          Vendor             @relation(fields: [vendorId], references: [id])
+  items           OrderItem[]
+  shipments       Shipment[]
+  shippingReturns ShippingReturn[]
+  refunds         Refund[]
+  disputes        Dispute[]
+  events          VendorOrderEvent[]
 
   @@index([vendorId, status])
   @@index([orderId])
@@ -781,6 +784,7 @@ model OrderItem {
   product        Product?        @relation(fields: [productId], references: [id])
   downloadGrants DownloadGrant[]
   booking        Booking?
+  shipmentItems  ShipmentItem[]
   review         Review?
 
   @@index([orderId])
@@ -1023,46 +1027,72 @@ model ShippingMethod {
 
 enum ShipmentStatus {
   PENDING
+  AWAITING_PICKUP
   PICKED_UP
   IN_TRANSIT
+  AT_SORTING_FACILITY
+  CUSTOMS_PROCESSING
   OUT_FOR_DELIVERY
   DELIVERED
-  FAILED_ATTEMPT
-  RETURNED
+  FAILED_ATTEMPT // "Delivery failed"
+  RETURNED // "Returned to sender"
+  CANCELLED
 }
 
 model Shipment {
-  id                 String              @id @default(cuid())
-  vendorOrderId      String
-  carrier            String              @default("Vendor delivery")
-  trackingNumber     String?
-  status             ShipmentStatus      @default(PENDING)
-  deliveryPartnerId  String?
-  proofOfDeliveryKey String?
-  recipientName      String?
-  providerKey        String?
-  providerShipmentId String?
-  service            String?
-  costMinor          BigInt?
-  costCurrency       String?
-  labelUrl           String?
-  trackingUrl        String?
-  international      Boolean             @default(false)
-  originCountry      String?
-  destinationCountry String?
-  weightGrams        Int?
-  lastEventAt        DateTime?
-  failureReason      String?
-  shippedAt          DateTime?
-  deliveredAt        DateTime?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  vendorOrder        VendorOrder         @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
-  deliveryPartner    User?               @relation(fields: [deliveryPartnerId], references: [id])
-  events             ShipmentEvent[]
-  customs            CustomsDeclaration?
+  id                  String                @id @default(cuid())
+  vendorOrderId       String
+  carrier             String                @default("Vendor delivery")
+  trackingNumber      String?
+  status              ShipmentStatus        @default(PENDING)
+  deliveryPartnerId   String?
+  proofOfDeliveryKey  String?
+  recipientName       String?
+  providerKey         String?
+  providerShipmentId  String?
+  service             String?
+  costMinor           BigInt?
+  costCurrency        String?
+  labelUrl            String?
+  trackingUrl         String?
+  international       Boolean               @default(false)
+  originCountry       String?
+  destinationCountry  String?
+  weightGrams         Int?
+  lastEventAt         DateTime?
+  failureReason       String?
+  shippedAt           DateTime?
+  deliveredAt         DateTime?
+  method              String? // SELLER | LOCAL_DISPATCH | STANDARD | EXPRESS | AIR_FREIGHT | SEA_FREIGHT
+  leg                 String                @default("DIRECT") // DIRECT | TO_WAREHOUSE | CONSOLIDATED | LAST_MILE | RETURN
+  quoteId             String? // ShippingQuote the label was bought from
+  idempotencyKey      String?               @unique // one booking per sub-order/quote, even on double-submit
+  originAddress       Json? // snapshot at booking
+  destinationAddress  Json? // snapshot at booking
+  estimatedDeliveryAt DateTime?
+  pickupScheduledAt   DateTime?
+  pickupRef           String?
+  cancelledAt         DateTime?
+  cancelReason        String?
+  lastPolledAt        DateTime?
+  consolidationId     String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  vendorOrder         VendorOrder           @relation(fields: [vendorOrderId], references: [id], onDelete: Cascade)
+  deliveryPartner     User?                 @relation(fields: [deliveryPartnerId], references: [id])
+  events              ShipmentEvent[]
+  customs             CustomsDeclaration?
+  items               ShipmentItem[]
+  labels              ShipmentLabel[]
+  consolidation       FreightConsolidation? @relation(fields: [consolidationId], references: [id])
+  warehouseReceipt    WarehouseReceipt?
+  invoices            ShippingInvoice[]
+  returnFor           ShippingReturn?       @relation("ReturnShipment")
 
   @@index([deliveryPartnerId, status])
+  @@index([vendorOrderId])
+  @@index([status, lastEventAt])
+  @@index([providerKey, providerShipmentId])
 }
 
 model ShipmentEvent {
@@ -1719,7 +1749,13 @@ model IntegrationProvider {
   credentialsEnc   String? // AES-256-GCM, never sent to the browser
   credentialHint   String? // last 4 characters only
   webhookSecretEnc String?
-  feeBps           Int              @default(0)
+  feeBps           Int              @default(0) // shipping: platform markup on carrier rates
+  priority         Int              @default(100) // lower = preferred when the strategy is RECOMMENDED
+  isDefault        Boolean          @default(false)
+  minWeightGrams   Int?
+  maxWeightGrams   Int?
+  zones            String[] // ShippingZone ids; empty = whole country list
+  category         String? // AGGREGATOR | NG_COURIER | INTL_EXPRESS | CN_NG_FREIGHT
   feeFixedMinor    BigInt           @default(0)
   notes            String?
   lastCheckAt      DateTime?
@@ -1886,6 +1922,15 @@ model ShippingQuote {
   providerKey        String
   vendorId           String
   vendorOrderId      String?
+  cartId             String? // checkout quote (before the order exists)
+  addressHash        String? // destination the quote is valid for
+  methodType         String? // LOCAL_DISPATCH | STANDARD | EXPRESS | AIR_FREIGHT | SEA_FREIGHT
+  trackingAvailable  Boolean   @default(true)
+  restrictions       String?
+  costMinor          BigInt? // carrier price before markup (amountMinor = what the customer pays)
+  markupMinor        BigInt    @default(0)
+  etaDaysMin         Int?
+  etaDaysMax         Int?
   providerRequestRef String?
   courierId          String?
   serviceCode        String
@@ -1897,6 +1942,7 @@ model ShippingQuote {
   createdAt          DateTime  @default(now())
 
   @@index([vendorOrderId])
+  @@index([cartId, vendorId])
 }
 
 model CustomsDeclaration {
@@ -1912,4 +1958,187 @@ model CustomsDeclaration {
   items              Json
   createdAt          DateTime @default(now())
   shipment           Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────────── Shipping & freight ─────────────────────────────
+
+/**
+ * Delivery zone within a country (e.g. Lagos Mainland, South-West) used to scope providers.
+ */
+model ShippingZone {
+  id        String   @id @default(cuid())
+  name      String
+  country   String
+  regions   String[] // states/provinces in the zone
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([country, name])
+}
+
+/**
+ * Which order lines travel in a shipment.
+ */
+model ShipmentItem {
+  id          String    @id @default(cuid())
+  shipmentId  String
+  orderItemId String
+  quantity    Int
+  shipment    Shipment  @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
+
+  @@unique([shipmentId, orderItemId])
+}
+
+model ShipmentLabel {
+  id         String   @id @default(cuid())
+  shipmentId String
+  format     String // PDF | PNG | ZPL | URL
+  storageKey String? // private copy when the provider returns the document itself
+  url        String? // provider-hosted label
+  createdAt  DateTime @default(now())
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+}
+
+/**
+ * Receiving warehouse/hub operated by a freight partner (China origin or Nigeria destination).
+ */
+model Warehouse {
+  id          String             @id @default(cuid())
+  code        String             @unique
+  name        String
+  country     String
+  city        String
+  address     String
+  contactName String?
+  phone       String?
+  partnerKey  String?
+  role        String // ORIGIN | DESTINATION
+  active      Boolean            @default(true)
+  notes       String?
+  createdAt   DateTime           @default(now())
+  receipts    WarehouseReceipt[]
+}
+
+/**
+ * A vendor parcel expected at / received by an origin warehouse.
+ */
+model WarehouseReceipt {
+  id              String                @id @default(cuid())
+  warehouseId     String
+  vendorId        String
+  vendorOrderId   String
+  shipmentId      String?               @unique
+  inboundCarrier  String?
+  inboundTracking String?
+  status          String                @default("EXPECTED") // EXPECTED | RECEIVED | CONSOLIDATED | DISPATCHED | EXCEPTION
+  weightGrams     Int?
+  lengthCm        Int?
+  widthCm         Int?
+  heightCm        Int?
+  pieces          Int                   @default(1)
+  receivedAt      DateTime?
+  receivedById    String?
+  exceptionNote   String?
+  consolidationId String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  warehouse       Warehouse             @relation(fields: [warehouseId], references: [id])
+  shipment        Shipment?             @relation(fields: [shipmentId], references: [id])
+  consolidation   FreightConsolidation? @relation(fields: [consolidationId], references: [id])
+
+  @@index([warehouseId, status])
+  @@index([vendorOrderId])
+}
+
+/**
+ * Air or sea consolidation from an origin warehouse to Nigeria, booked with a freight partner.
+ */
+model FreightConsolidation {
+  id                 String             @id @default(cuid())
+  reference          String             @unique
+  mode               String // AIR | SEA
+  partnerKey         String
+  originWarehouseId  String
+  destinationCountry String             @default("NG")
+  status             String             @default("OPEN") // OPEN | BOOKED | DEPARTED | ARRIVED | CUSTOMS | CLEARED | LAST_MILE | CLOSED | CANCELLED
+  partnerReference   String?
+  quotedCostMinor    BigInt?
+  quotedCurrency     String?
+  quoteIncludes      String?
+  quoteExcludes      String?
+  etd                DateTime?
+  eta                DateTime?
+  departedAt         DateTime?
+  arrivedAt          DateTime?
+  clearedAt          DateTime?
+  createdById        String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  receipts           WarehouseReceipt[]
+  shipments          Shipment[]
+  events             FreightEvent[]
+  invoices           ShippingInvoice[]
+
+  @@index([status])
+}
+
+model FreightEvent {
+  id              String               @id @default(cuid())
+  consolidationId String
+  status          String
+  note            String?
+  location        String?
+  actorId         String?
+  createdAt       DateTime             @default(now())
+  consolidation   FreightConsolidation @relation(fields: [consolidationId], references: [id], onDelete: Cascade)
+
+  @@index([consolidationId, createdAt])
+}
+
+/**
+ * Carrier / freight partner invoice to XavierConnect (cost side of shipping reconciliation).
+ */
+model ShippingInvoice {
+  id              String                @id @default(cuid())
+  providerKey     String
+  invoiceNumber   String
+  shipmentId      String?
+  consolidationId String?
+  amountMinor     BigInt
+  currency        String
+  issuedAt        DateTime
+  status          String                @default("UNPAID") // UNPAID | PAID | DISPUTED
+  fileKey         String?
+  note            String?
+  createdById     String
+  createdAt       DateTime              @default(now())
+  shipment        Shipment?             @relation(fields: [shipmentId], references: [id])
+  consolidation   FreightConsolidation? @relation(fields: [consolidationId], references: [id])
+
+  @@unique([providerKey, invoiceNumber])
+}
+
+/**
+ * Customer return of a delivered sub-order. Refunds go through the normal ledger refund.
+ */
+model ShippingReturn {
+  id               String      @id @default(cuid())
+  vendorOrderId    String
+  requestedById    String
+  reason           String
+  details          String?
+  status           String      @default("REQUESTED") // REQUESTED | APPROVED | REJECTED | IN_TRANSIT | RECEIVED | REFUNDED | CLOSED
+  returnShipmentId String?     @unique
+  decidedById      String?
+  decidedAt        DateTime?
+  decisionNote     String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  vendorOrder      VendorOrder @relation(fields: [vendorOrderId], references: [id])
+  returnShipment   Shipment?   @relation("ReturnShipment", fields: [returnShipmentId], references: [id])
+
+  @@index([status, createdAt])
 }

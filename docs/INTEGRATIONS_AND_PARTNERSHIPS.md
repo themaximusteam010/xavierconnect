@@ -17,12 +17,18 @@ switched on under **Admin → Integrations**, with credentials and approvals in 
 
 ## Shipping providers
 
+Full report with sources: [`SHIPPING_PROVIDERS.md`](SHIPPING_PROVIDERS.md).
+
 | Provider | Code status | Still needed |
 |---|---|---|
-| Shipbubble (domestic NG) | Implemented from public docs: address validate, fetch rates, labels, `x-ship-signature` webhooks | API key and `categoryId`. **Confirm in sandbox:** the auth header format (coded as Bearer), the package item field names and the status vocabulary (all marked `TO CONFIRM` in the adapter). Cancel endpoint not verified, so cancellation is off |
-| DHL Express (CN → NG, international) | Placeholder (NOT_IMPLEMENTED) | DHL account and MyDHL API credentials, docs verified, customs/commercial-invoice flow |
-| NIPOST | Placeholder (NOT_IMPLEMENTED) | API availability and credentials |
-| Sandbox carrier | Simulator: NG→NG, CN/GH/GB/US→NG | Test only |
+| Shipbubble (NG → NG) | Adapter built from the public docs: validate, rates, labels, cancel, tracking, signed webhooks | API key + default category ID; sandbox test of a full booking |
+| GIG Logistics | Login + connection test only | GIG merchant account; enum meanings and tracking response from GIG before enabling price/booking |
+| DHL Express | Rates (vendor booking), tracking, service-area check | DHL account + MyDHL API access; implement shipment booking against the test host; rate-terms review |
+| FedEx | OAuth + connection test only | FedEx account; confirm the Nigeria (Red Star Express) service |
+| RUN Delivery | Profile only | API documentation and credentials from RUN |
+| Skyways / Aquantuo / Colala | Manual freight workflow | Business accounts; ask each for an API or status feed |
+| NIPOST | Profile only | API availability |
+| Sandbox carrier | Simulator | Test only. Refused in production unless `ALLOW_SANDBOX_SHIPPING=true` |
 
 ## Platform dependencies (environment)
 
@@ -33,6 +39,7 @@ switched on under **Admin → Integrations**, with credentials and approvals in 
 | `CRON_SECRET` | Bearer for `/api/jobs/run` (settlement, webhook retries, reconciliation, monitoring) | Yes |
 | `OPS_ALERT_EMAIL` | Address that receives critical alerts | Recommended |
 | `ALLOW_SANDBOX_PAYMENTS` | Must be unset in production | — |
+| `ALLOW_SANDBOX_SHIPPING` | Must be unset in production (the sandbox carrier quotes formula prices) | — |
 | `PAYSTACK_SECRET_KEY` | Optional fallback; prefer storing the key encrypted in Admin → Integrations | — |
 
 ## Not built (explicitly out of scope until partners exist)

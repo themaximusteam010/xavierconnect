@@ -17,12 +17,19 @@ export const sandboxShipping: ShippingAdapter = {
   key: "sandbox-shipping",
   name: "Sandbox carrier",
   kind: "SHIPPING",
-  capabilities: ["RATE_QUOTE", "CREATE_SHIPMENT", "LABEL", "TRACKING", "WEBHOOKS", "INTERNATIONAL", "DELIVERY_CONFIRMATION"],
+  capabilities: ["RATE_QUOTE", "CREATE_SHIPMENT", "LABEL", "TRACKING", "CANCEL", "WEBHOOKS", "INTERNATIONAL", "DELIVERY_CONFIRMATION"],
   status: "SANDBOX_SIMULATOR",
   routes: ["NG>NG", "CN>NG", "GH>NG", "GB>NG", "US>NG"],
+  rateValidityMs: 2 * 864e5,
   notes: "Simulated carrier for testing domestic and China→Nigeria flows. Quotes are formula-based, not real prices. No parcels move.",
   credentialFields: [],
-  async quote(_ctx, r) {
+  profile: {
+    category: "TEST", countries: ["NG", "CN", "GH", "GB", "US"], scope: ["DOMESTIC", "INTERNATIONAL", "IMPORT"], freightModes: ["ROAD", "AIR"],
+    api: "PUBLIC", sandbox: "Built in", businessAccount: "None", credentialsNote: "None",
+    supports: { quote: "YES", booking: "YES", tracking: "YES", webhooks: "YES", labels: "NO", pickup: "NO", returns: "NO", addressValidation: "NO", cancel: "YES" },
+    baseStatus: "AVAILABLE_FOR_INTEGRATION", complexity: "LOW", remaining: ["Never enable in production"], sources: [],
+  },
+  async getRates(_ctx, r) {
     const kg = Math.max(1, Math.ceil(r.items.reduce((a, i) => a + i.weightGrams * i.quantity, 0) / 1000));
     const intl = r.origin.country !== r.destination.country;
     const base = intl ? 1_500_000n : 250_000n; // kobo
@@ -31,14 +38,17 @@ export const sandboxShipping: ShippingAdapter = {
     return {
       requestRef: `sbx_req_${randomBytes(5).toString("hex")}`,
       rates: [
-        { courierId: "sbx-economy", serviceCode: intl ? "INTL_ECONOMY" : "ECONOMY", courierName: intl ? "Sandbox Air Economy" : "Sandbox Economy", amountMinor: std, currency: "NGN", etaText: intl ? "10–18 business days (sandbox estimate)" : "3–5 business days (sandbox estimate)" },
-        { courierId: "sbx-express", serviceCode: intl ? "INTL_EXPRESS" : "EXPRESS", courierName: intl ? "Sandbox Air Express" : "Sandbox Express", amountMinor: (std * 18n) / 10n, currency: "NGN", etaText: intl ? "5–8 business days (sandbox estimate)" : "1–2 business days (sandbox estimate)" },
+        { courierId: "sbx-economy", serviceCode: intl ? "INTL_ECONOMY" : "ECONOMY", courierName: intl ? "Sandbox Air Economy" : "Sandbox Economy", amountMinor: std, currency: "NGN", etaText: intl ? "10–18 business days (sandbox estimate)" : "3–5 business days (sandbox estimate)", methodType: (intl ? "AIR_FREIGHT" : "STANDARD") as "AIR_FREIGHT" | "STANDARD", etaDaysMin: intl ? 10 : 3, etaDaysMax: intl ? 18 : 5, trackingAvailable: true, validForMs: 30 * 60_000 },
+        { courierId: "sbx-express", serviceCode: intl ? "INTL_EXPRESS" : "EXPRESS", courierName: intl ? "Sandbox Air Express" : "Sandbox Express", amountMinor: (std * 18n) / 10n, currency: "NGN", etaText: intl ? "5–8 business days (sandbox estimate)" : "1–2 business days (sandbox estimate)", methodType: "EXPRESS" as const, etaDaysMin: intl ? 5 : 1, etaDaysMax: intl ? 8 : 2, trackingAvailable: true, validForMs: 30 * 60_000 },
       ],
     };
   },
   async createShipment(_ctx, s) {
     const id = `SBX${randomBytes(5).toString("hex").toUpperCase()}`;
     return { providerShipmentId: id, trackingNumber: id, courierName: s.rate.courierName };
+  },
+  async cancelShipment(_ctx, id) {
+    return { ok: true, message: `Sandbox shipment ${id} cancelled (no real carrier involved).` };
   },
   parseWebhook(_ctx, raw, h) {
     const sig = h.get("x-sandbox-signature") ?? "";

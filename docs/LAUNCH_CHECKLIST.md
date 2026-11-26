@@ -6,6 +6,11 @@
 - [ ] Manual-transfer maker/checker procedure written; finance staff enrolled in MFA
 - [ ] `ENCRYPTION_KEY` generated, stored in a secrets manager, set in Vercel; `OPS_ALERT_EMAIL` set
 - [ ] Review and apply migration `20261126090000_international_operations` (additive) to production
+- [ ] Review and apply migration `20261128090000_shipping_logistics` (additive) to production
+- [ ] Sandbox carrier switched off in Admin → Integrations → Shipping; `ALLOW_SANDBOX_SHIPPING` unset
+- [ ] At least one real carrier (e.g. Shipbubble) connected and passing **Test connection**; one sandbox booking, cancel and webhook tested
+- [ ] Products have weight and dimensions (needed for courier prices at checkout); `returnWindowDays` and `shippingSelection` reviewed in Platform settings
+- [ ] For China → Nigeria: origin warehouse added with the partner's exact address; partner account in place
 - [ ] Update the live Vendor Agreement CMS page (seed text is not re-applied to existing pages)
 - [ ] Cross-border corridors stay DISABLED until partners and approvals in `docs/REGULATORY_CORRIDORS.md` are in place
 - [ ] Email sender (SMTP/Resend) worker implemented; SPF/DKIM/DMARC on sending domain

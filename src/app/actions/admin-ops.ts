@@ -312,7 +312,11 @@ export async function saveSettingsAction(fd: FormData) {
       if (!Number.isFinite(n) || n < 0 || n > 100_000) to("/admin/settings", "error", `${key} must be a positive number.`);
       value = n;
     } else {
-      if (key === "minPayoutMinor") {
+      if (key === "shippingSelection") {
+        const v = String(raw).trim().toUpperCase();
+        if (!["CHEAPEST", "FASTEST", "RECOMMENDED", "MANUAL"].includes(v)) to("/admin/settings", "error", "Courier selection must be CHEAPEST, FASTEST, RECOMMENDED or MANUAL.");
+        value = v;
+      } else if (key === "minPayoutMinor") {
         const m = parseNairaToMinor(String(raw));
         if (m == null) to("/admin/settings", "error", "Minimum payout must be a naira amount.");
         value = m!.toString();

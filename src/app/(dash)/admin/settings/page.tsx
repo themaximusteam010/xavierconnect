@@ -22,6 +22,9 @@ const META: Record<SettingKey, { label: string; hint: string; unit?: string }> =
   msgRestrictAfter: { label: "Messaging: restrict after", hint: "Confirmed violations in the window before sending is paused. The first one is a warning.", unit: "violations" },
   msgRestrictHours: { label: "Messaging: restriction length", hint: "How long an automatic restriction lasts.", unit: "hours" },
   msgReviewAfter: { label: "Messaging: admin review after", hint: "Confirmed violations before the account is flagged for a moderator. Suspension is always a staff decision.", unit: "violations" },
+  shippingSelection: { label: "Checkout courier selection", hint: "CHEAPEST (only the cheapest), FASTEST (only the fastest with a known delivery time), RECOMMENDED (all, highest-priority provider preselected) or MANUAL (all, customer picks).", unit: "" },
+  returnWindowDays: { label: "Return request window", hint: "Days after delivery a customer can ask to return a sub-order. Returns are only possible before the seller's earnings are released.", unit: "days" },
+  checkoutQuoteMinutes: { label: "Courier price validity at checkout", hint: "After this, checkout fetches fresh courier prices.", unit: "minutes" },
   msgBlockedRetentionDays: { label: "Messaging: blocked-content retention", hint: "Blocked message text and flagged attachments are purged after this.", unit: "days" },
 };
 

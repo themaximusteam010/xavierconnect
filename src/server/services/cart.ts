@@ -1,4 +1,5 @@
 import { methodServes } from "@/lib/countries";
+import { quoteKey, resolveCheckoutQuote } from "./shipping-rates";
 import type { DbClient } from "@/server/db";
 import { priceOrder, type CouponInput, type PricingLine, type ShippingMethodInput } from "@/server/domain/pricing";
 import type { CommissionRuleInput } from "@/server/domain/commission";
@@ -111,7 +112,7 @@ export async function resolveCoupon(db: DbClient, code: string | null | undefine
 }
 
 /** Load a cart with everything needed to render and price it. */
-export async function loadCartView(db: DbClient, ident: CartIdent, shippingChoice: Record<string, string> = {}) {
+export async function loadCartView(db: DbClient, ident: CartIdent, shippingChoice: Record<string, string> = {}, opts: { destination?: { line1: string; city: string; state: string; country?: string } | null } = {}) {
   const cart = await findCart(db, ident);
   if (!cart) return null;
   const items = await db.cartItem.findMany({
@@ -156,6 +157,8 @@ export async function loadCartView(db: DbClient, ident: CartIdent, shippingChoic
   const shippingByVendor: Record<string, ShippingMethodInput | null> = {};
   const shippingOptions: Record<string, { id: string; name: string; etaDaysMin: number; etaDaysMax: number }[]> = {};
   const vendorOrigin: Record<string, string> = {};
+  const carrierQuotes: Record<string, { quoteId: string; costMinor: bigint; providerKey: string; courierName: string }> = {};
+  const staleQuotes: string[] = [];
   const vendorPlans: Record<string, string | null> = {};
   for (const i of valid) {
     const v = i.product.vendor;
@@ -164,7 +167,19 @@ export async function loadCartView(db: DbClient, ident: CartIdent, shippingChoic
     const usable = v.shippingMethods.filter((m) => methodServes(v.country, m, "NG"));
     vendorOrigin[v.id] = v.country;
     shippingOptions[v.id] = usable.map((m) => ({ id: m.id, name: m.name, etaDaysMin: m.etaDaysMin, etaDaysMax: m.etaDaysMax }));
-    const chosen = usable.find((m) => m.id === shippingChoice[v.id]) ?? usable[0] ?? null;
+    let chosen: ShippingMethodInput | null = usable.find((m) => m.id === shippingChoice[v.id]) ?? null;
+    // Courier quote chosen at checkout ("q:<id>"): valid only for this cart, seller, destination and items.
+    const pick = shippingChoice[v.id];
+    if (!chosen && pick?.startsWith("q:")) {
+      const vendorLines = valid.filter((i) => i.product.vendorId === v.id && i.product.type !== "DIGITAL").map((i) => ({ productId: i.productId, quantity: i.quantity }));
+      const key = opts.destination ? quoteKey(opts.destination, vendorLines) : null;
+      const q = await resolveCheckoutQuote(pick, cart.id, v.id, key);
+      if (q) {
+        chosen = { id: `q:${q.id}`, type: "FLAT", rateMinor: q.amountMinor, perKgMinor: 0n, freeOverMinor: null };
+        carrierQuotes[v.id] = { quoteId: q.id, costMinor: q.costMinor ?? q.amountMinor, providerKey: q.providerKey, courierName: q.courierName };
+      } else if (opts.destination) staleQuotes.push(v.id);
+    }
+    chosen = chosen ?? usable[0] ?? null;
     shippingByVendor[v.id] = chosen;
     vendorPlans[v.id] = v.subscription?.status === "ACTIVE" ? v.subscription.plan.key : null;
   }
@@ -178,7 +193,7 @@ export async function loadCartView(db: DbClient, ident: CartIdent, shippingChoic
     vendorPlans,
     taxBps: await getSetting(db, "taxBps"),
   });
-  return { cart, items: valid, pricing, shippingByVendor, shippingOptions, vendorOrigin, issues, couponCode: cart.couponCode, couponValid: !!coupon };
+  return { cart, items: valid, pricing, shippingByVendor, shippingOptions, vendorOrigin, carrierQuotes, staleQuotes, issues, couponCode: cart.couponCode, couponValid: !!coupon };
 }
 
 export type CartView = NonNullable<Awaited<ReturnType<typeof loadCartView>>>;

@@ -279,10 +279,16 @@ export async function seedIntegrations(client: PrismaClient) {
     { key: "manual", kind: "PAYMENT", name: "Manual bank transfer", active: true, approval: "NOT_REQUIRED", countries: ["NG"], currencies: ["NGN"], methods: ["bank_transfer"] },
     { key: "sandbox-payouts", kind: "PAYMENT", name: "Sandbox domestic payouts", active: true, approval: "NOT_REQUIRED", countries: ["NG"], currencies: ["NGN"], methods: ["bank_transfer"] },
     { key: "sandbox-crossborder", kind: "PAYMENT", name: "Sandbox cross-border partner", active: true, approval: "NOT_REQUIRED", countries: ["CN"], currencies: ["CNY"], methods: ["bank_transfer"] },
-    { key: "shipbubble", kind: "SHIPPING", name: "Shipbubble", active: false, approval: "NOT_STARTED", countries: ["NG"], currencies: ["NGN"], methods: [] },
-    { key: "dhl-express", kind: "SHIPPING", name: "DHL Express", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [] },
-    { key: "nipost", kind: "SHIPPING", name: "NIPOST", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [] },
-    { key: "sandbox-shipping", kind: "SHIPPING", name: "Sandbox carrier", active: true, approval: "NOT_REQUIRED", countries: ["NG", "CN", "GH", "GB", "US"], currencies: ["NGN"], methods: [] },
+    { key: "shipbubble", kind: "SHIPPING", name: "Shipbubble", active: false, approval: "NOT_STARTED", countries: ["NG"], currencies: ["NGN"], methods: [], category: "AGGREGATOR", priority: 10 },
+    { key: "gig-logistics", kind: "SHIPPING", name: "GIG Logistics", active: false, approval: "NOT_STARTED", countries: ["NG"], currencies: ["NGN"], methods: [], category: "NG_COURIER", priority: 20 },
+    { key: "run-delivery", kind: "SHIPPING", name: "RUN Delivery", active: false, approval: "NOT_STARTED", countries: ["NG"], currencies: ["NGN"], methods: [], category: "NG_COURIER", priority: 30 },
+    { key: "dhl-express", kind: "SHIPPING", name: "DHL Express", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [], category: "INTL_EXPRESS", priority: 40 },
+    { key: "fedex", kind: "SHIPPING", name: "FedEx", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [], category: "INTL_EXPRESS", priority: 50 },
+    { key: "skyways", kind: "SHIPPING", name: "Skyways Shipping", active: false, approval: "NOT_STARTED", countries: ["CN", "NG"], currencies: [], methods: [], category: "CN_NG_FREIGHT", priority: 60 },
+    { key: "aquantuo", kind: "SHIPPING", name: "Aquantuo", active: false, approval: "NOT_STARTED", countries: ["CN", "NG"], currencies: [], methods: [], category: "CN_NG_FREIGHT", priority: 70 },
+    { key: "colala", kind: "SHIPPING", name: "Colala Logistics", active: false, approval: "NOT_STARTED", countries: ["CN", "NG"], currencies: [], methods: [], category: "CN_NG_FREIGHT", priority: 80 },
+    { key: "nipost", kind: "SHIPPING", name: "NIPOST", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [], category: "NG_COURIER", priority: 90 },
+    { key: "sandbox-shipping", kind: "SHIPPING", name: "Sandbox carrier", active: true, approval: "NOT_REQUIRED", countries: ["NG", "CN", "GH", "GB", "US"], currencies: ["NGN"], methods: [], category: "TEST", priority: 999 },
   ] as const;
   for (const p of providers) {
     await client.integrationProvider.upsert({ where: { key: p.key }, update: {}, create: { ...p, countries: [...p.countries], currencies: [...p.currencies], methods: [...p.methods] } });

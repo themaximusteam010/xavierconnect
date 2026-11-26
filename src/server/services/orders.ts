@@ -14,6 +14,7 @@ import { postLedger, PlatformAccounts, vendorAccountCode, type EntryInput } from
 import { sum } from "@/lib/money";
 import { getProvider } from "@/server/payments";
 import { CartError, loadCartView, type CartIdent } from "./cart";
+import { shippingAdapter } from "@/server/integrations/registry";
 import { getSetting } from "./settings";
 import { notify, appUrl } from "./notify";
 import { audit } from "./audit";
@@ -47,8 +48,9 @@ export async function placeOrder(input: PlaceOrderInput) {
   const reservationMinutes = await getSetting(db, "reservationMinutes");
   const result = await db.$transaction(
     async (tx) => {
-      const view = await loadCartView(tx, input.ident, input.shippingChoice);
+      const view = await loadCartView(tx, input.ident, input.shippingChoice, { destination: input.address ?? null });
       if (!view || view.items.length === 0) throw new CartError("Your cart is empty.");
+      if (view.staleQuotes.length) throw new CartError("A courier price has expired or no longer matches your delivery address. Review the delivery options and try again.");
       const { pricing, items } = view;
       if (!input.ident.userId && items.some((i) => i.product.type === "DIGITAL")) {
         throw new CartError("Please sign in to buy digital products, so your downloads are kept safely in your account.");
@@ -112,10 +114,18 @@ export async function placeOrder(input: PlaceOrderInput) {
             totalMinor: v.totalMinor,
             commissionMinor: v.commissionMinor,
             vendorNetMinor: v.vendorNetMinor,
-            shippingMethodId: view.shippingByVendor[v.vendorId]?.id ?? null,
+            shippingMethodId: view.carrierQuotes[v.vendorId] ? null : view.shippingByVendor[v.vendorId]?.id ?? null,
+            shippingQuoteId: view.carrierQuotes[v.vendorId]?.quoteId ?? null,
+            shippingCostMinor: view.carrierQuotes[v.vendorId]?.costMinor ?? null,
             settlementCurrency: items.find((i) => i.product.vendorId === v.vendorId)?.product.vendor.payoutCurrency ?? "NGN",
           },
         });
+        const cq = view.carrierQuotes[v.vendorId];
+        if (cq) {
+          // The customer paid this courier price: keep the quote for the vendor to book (within the provider's token life).
+          const validity = shippingAdapter(cq.providerKey)?.rateValidityMs ?? 0;
+          await tx.shippingQuote.update({ where: { id: cq.quoteId }, data: { vendorOrderId: vo.id, cartId: null, expiresAt: new Date(Date.now() + (validity > 0 ? validity : 15 * 60_000)) } });
+        }
         for (const l of v.lines) {
           const ci = itemById.get(l.key)!;
           const variant = ci.variantKey ? ci.product.variants.find((x) => x.id === ci.variantKey) : null;

@@ -5,11 +5,14 @@ import { sandboxCrossBorder, sandboxDomesticPayouts } from "./payments/sandbox";
 import { chamsswitchKardit, flutterwave, manualPayouts } from "./payments/pending";
 import { shipbubble } from "./shipping/shipbubble";
 import { sandboxShipping } from "./shipping/sandbox";
-import { dhlExpress, nipost } from "./shipping/pending";
+import { aquantuo, colala, nipost, runDelivery, skyways } from "./shipping/pending";
+import { dhlExpress } from "./shipping/dhl";
+import { fedex } from "./shipping/fedex";
+import { gigLogistics } from "./shipping/gig";
 import { ProviderUnavailableError, type PaymentCapability, type PayoutAdapter, type ProviderContext, type ShippingAdapter, type ShippingCapability } from "./types";
 
 export const PAYMENT_ADAPTERS: PayoutAdapter[] = [paystackTransfers, flutterwave, chamsswitchKardit, manualPayouts, sandboxDomesticPayouts, sandboxCrossBorder];
-export const SHIPPING_ADAPTERS: ShippingAdapter[] = [shipbubble, dhlExpress, nipost, sandboxShipping];
+export const SHIPPING_ADAPTERS: ShippingAdapter[] = [shipbubble, gigLogistics, runDelivery, dhlExpress, fedex, skyways, aquantuo, colala, nipost, sandboxShipping];
 
 export const paymentAdapter = (key: string) => PAYMENT_ADAPTERS.find((a) => a.key === key);
 export const shippingAdapter = (key: string) => SHIPPING_ADAPTERS.find((a) => a.key === key);
@@ -37,10 +40,15 @@ export async function requirePayment(key: string, cap: PaymentCapability) {
   return { adapter: a, ctx };
 }
 
+/** The shipping simulator returns formula prices, so production needs its own explicit opt-in (never the payments flag). */
+export function sandboxShippingAllowed() {
+  return process.env.NODE_ENV !== "production" || process.env.ALLOW_SANDBOX_SHIPPING === "true";
+}
+
 export async function requireShipping(key: string, cap: ShippingCapability) {
   const a = shippingAdapter(key);
   if (!a || !a.capabilities.includes(cap)) throw new ProviderUnavailableError(key, cap);
-  if (a.status === "SANDBOX_SIMULATOR" && !sandboxAllowed()) throw new ProviderUnavailableError(key, `${cap} (sandbox disabled in production)`);
+  if (a.status === "SANDBOX_SIMULATOR" && !sandboxShippingAllowed()) throw new ProviderUnavailableError(key, `${cap} (test carrier disabled in production)`);
   const ctx = await providerContext(key);
   if (!ctx.active) throw new ProviderUnavailableError(key, `${cap} (provider inactive)`);
   return { adapter: a, ctx };

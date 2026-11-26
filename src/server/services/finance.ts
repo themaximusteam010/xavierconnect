@@ -28,6 +28,7 @@ export async function releaseSettlements(now = new Date(), holdDays?: number) {
       status: "DELIVERED",
       settledAt: null,
       disputes: { none: { status: { in: ["OPEN", "AWAITING_VENDOR", "UNDER_REVIEW"] } } },
+      shippingReturns: { none: { status: { in: ["REQUESTED", "APPROVED", "IN_TRANSIT", "RECEIVED"] } } }, // open return pauses settlement
       OR: [
         // Verified delivery evidence: normal hold window.
         { deliveryEvidence: { in: STRONG_EVIDENCE }, deliveredAt: { lte: cutoff } },

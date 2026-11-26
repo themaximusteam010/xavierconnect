@@ -13,6 +13,9 @@ export const SETTING_DEFAULTS = {
   msgRestrictHours: 24,
   msgReviewAfter: 5, // confirmed violations before the account is flagged for administrative review
   msgBlockedRetentionDays: 90, // blocked message text and flagged files are purged after this
+  shippingSelection: "RECOMMENDED", // CHEAPEST | FASTEST | RECOMMENDED | MANUAL — which courier options checkout shows/preselects
+  checkoutQuoteMinutes: 30, // how long a courier price shown at checkout stays valid
+  returnWindowDays: 7, // days after delivery a customer can request a return (before the seller is paid)
 } as const;
 
 export type SettingKey = keyof typeof SETTING_DEFAULTS;

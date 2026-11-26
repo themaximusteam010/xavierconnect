@@ -7,6 +7,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { FlashFromQuery, StatusBadge } from "@/components/ui/feedback";
 import { Input, Textarea } from "@/components/ui/form";
 import { vendorDisputeReplyAction } from "@/app/actions/disputes";
+import { vendorDecideReturnAction, vendorReceiveReturnAction } from "@/app/actions/shipping-ops";
+import { shippingProviderName, STATUS_LABEL } from "@/server/services/shipping";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { formatMoney } from "@/lib/money";
 
@@ -19,7 +21,7 @@ export default async function VendorOrder({ params, searchParams }: { params: Pr
   // Tenant boundary: vendorId in the where clause. Another vendor's id returns 404.
   const vo = await db.vendorOrder.findFirst({
     where: { id, vendorId },
-    include: { items: { include: { product: { select: { slug: true } } } }, order: { select: { number: true, shippingAddress: true, contactPhone: true, guestEmail: true, user: { select: { name: true } } } }, events: { orderBy: { createdAt: "asc" } }, shipments: true, disputes: { orderBy: { createdAt: "desc" }, include: { evidence: { orderBy: { createdAt: "asc" } } } } },
+    include: { items: { include: { product: { select: { slug: true } } } }, order: { select: { number: true, shippingAddress: true, contactPhone: true, guestEmail: true, user: { select: { name: true } } } }, events: { orderBy: { createdAt: "asc" } }, shipments: { orderBy: { createdAt: "asc" }, include: { events: { orderBy: { createdAt: "desc" }, take: 3 } } }, shippingReturns: { orderBy: { createdAt: "desc" }, include: { returnShipment: true } }, disputes: { orderBy: { createdAt: "desc" }, include: { evidence: { orderBy: { createdAt: "asc" } } } } },
   });
   if (!vo) notFound();
   const a = vo.order.shippingAddress as { fullName: string; phone: string; line1: string; line2?: string; city: string; state: string } | null;
@@ -32,6 +34,21 @@ export default async function VendorOrder({ params, searchParams }: { params: Pr
     <>
       <PageHeader eyebrow="Order" title={vo.number} actions={vo.order.user ? <a href={`/vendor-messages/start?order=${vo.id}`} className="inline-flex h-9 items-center rounded-md border border-line-strong bg-white px-3 text-sm font-medium hover:bg-sunken">Message buyer</a> : undefined} description={<span className="flex items-center gap-2"><StatusBadge status={vo.status} /> Placed {vo.createdAt.toLocaleString("en-NG", { dateStyle: "long", timeStyle: "short" })}</span>} />
       <FlashFromQuery ok={sp.ok} error={sp.error} />
+      {vo.shippingReturns.map((r) => (
+        <section key={r.id} className={`mb-6 rounded-lg border p-4 text-sm ${["REQUESTED", "APPROVED", "IN_TRANSIT", "RECEIVED"].includes(r.status) ? "border-amber-300 bg-warning-soft" : "border-line bg-white"}`}>
+          <p className="font-semibold">Return request: {r.reason} <StatusBadge status={r.status} /></p>
+          {r.details && <p className="mt-1 whitespace-pre-line">{r.details}</p>}
+          {r.decisionNote && <p className="mt-1"><span className="font-medium">Note:</span> {r.decisionNote}</p>}
+          {r.returnShipment && <p className="mt-1">Buyer sent it back with {r.returnShipment.carrier}{r.returnShipment.trackingNumber && ` · ${r.returnShipment.trackingNumber}`}.</p>}
+          {["REQUESTED", "APPROVED", "IN_TRANSIT", "RECEIVED"].includes(r.status) && <p className="mt-1 text-warning">Your earnings for this order are on hold until the return is closed.</p>}
+          {r.status === "REQUESTED" && (
+            <form action={vendorDecideReturnAction} className="mt-3 flex flex-wrap gap-2"><input type="hidden" name="id" value={r.id} /><input type="hidden" name="vendorOrderId" value={vo.id} /><Input name="note" placeholder="Return address / instructions, or reason for rejecting" className="w-80" /><SubmitButton size="sm" name="decision" value="approve">Approve return</SubmitButton><SubmitButton size="sm" variant="ghost" name="decision" value="reject">Reject</SubmitButton></form>
+          )}
+          {["APPROVED", "IN_TRANSIT", "RECEIVED"].includes(r.status) && (
+            <form action={vendorReceiveReturnAction} className="mt-3 flex flex-wrap gap-2"><input type="hidden" name="id" value={r.id} /><input type="hidden" name="vendorOrderId" value={vo.id} /><Input name="note" placeholder="Condition on arrival" className="w-72" /><SubmitButton size="sm" confirm="Confirm you have the item back? The buyer is refunded for this order.">Item received · refund buyer</SubmitButton></form>
+          )}
+        </section>
+      ))}
       {vo.disputes.map((d) => (
         <section key={d.id} className={`mb-6 rounded-lg border p-4 text-sm ${["OPEN", "AWAITING_VENDOR", "UNDER_REVIEW"].includes(d.status) ? "border-amber-300 bg-warning-soft" : "border-line bg-white"}`}>
           <p className="font-semibold">Dispute: {d.reason} <StatusBadge status={d.status} /></p>
@@ -95,7 +112,15 @@ export default async function VendorOrder({ params, searchParams }: { params: Pr
           )}
           {["NEW", "PROCESSING", "READY_FOR_DISPATCH"].includes(vo.status) && <a href={`/vendor/shipments?order=${vo.id}`} className="block rounded-lg border border-line bg-white p-4 text-sm text-brand hover:border-brand">Buy a carrier label for this order →</a>}
           {vo.status === "SHIPPED" && <p className="rounded-lg border border-line bg-white p-4 text-[12px] text-ink-muted">If you confirm delivery yourself, earnings are held longer than when the buyer, a carrier scan or rider proof confirms it.</p>}
-          {vo.shipments.map((s) => <section key={s.id} className="rounded-lg border border-line bg-white p-4 text-sm"><h2 className="mb-1 font-semibold">Shipment</h2><p>{s.carrier}{s.trackingNumber ? ` · ${s.trackingNumber}` : ""}</p><StatusBadge status={s.status} /></section>)}
+          {vo.shipments.map((s) => (
+            <section key={s.id} className="rounded-lg border border-line bg-white p-4 text-sm">
+              <h2 className="mb-1 font-semibold">Shipment{s.leg !== "DIRECT" ? ` · ${s.leg.toLowerCase().replace(/_/g, " ")}` : ""}</h2>
+              <p>{s.carrier} <span className="text-[12px] text-ink-muted">({shippingProviderName(s.providerKey)})</span></p>
+              {s.trackingNumber && <p className="font-mono text-[12px]">{s.trackingUrl ? <a href={s.trackingUrl} target="_blank" rel="noopener noreferrer" className="text-brand">{s.trackingNumber}</a> : s.trackingNumber}</p>}
+              <p className="mt-1"><StatusBadge status={s.status} /></p>
+              {s.events.length > 0 && <ul className="mt-2 space-y-0.5 text-[12px] text-ink-muted">{s.events.map((e) => <li key={e.id}>{e.createdAt.toLocaleDateString("en-NG")} · {STATUS_LABEL[e.status]}{e.note && ` — ${e.note}`}</li>)}</ul>}
+            </section>
+          ))}
         </aside>
       </div>
     </>

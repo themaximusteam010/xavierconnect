@@ -33,7 +33,7 @@ export function Badge({ tone = "neutral", children, className }: { tone?: Tone; 
 
 const STATUS_TONE: Record<string, Tone> = {
   PUBLISHED: "success", APPROVED: "success", PAID: "success", COMPLETED: "success", DELIVERED: "success", FULFILLED: "success", SUCCEEDED: "success", CONFIRMED: "success", RESOLVED: "success", ACTIVE: "success",
-  PENDING_REVIEW: "warning", SUBMITTED: "warning", PENDING_PAYMENT: "warning", AWAITING_PAYMENT: "warning", REQUESTED: "warning", PROCESSING: "info", NEW: "brand", OPEN: "warning", CHANGES_REQUESTED: "warning", PARTIALLY_FULFILLED: "info", READY_FOR_DISPATCH: "info", SHIPPED: "info", IN_TRANSIT: "info", ESCALATED: "danger",
+  PENDING_REVIEW: "warning", SUBMITTED: "warning", PENDING_PAYMENT: "warning", AWAITING_PAYMENT: "warning", REQUESTED: "warning", PROCESSING: "info", NEW: "brand", OPEN: "warning", CHANGES_REQUESTED: "warning", PARTIALLY_FULFILLED: "info", READY_FOR_DISPATCH: "info", SHIPPED: "info", IN_TRANSIT: "info", AWAITING_PICKUP: "info", PICKED_UP: "info", AT_SORTING_FACILITY: "info", CUSTOMS_PROCESSING: "warning", OUT_FOR_DELIVERY: "info", FAILED_ATTEMPT: "danger", RETURNED: "danger", RECEIVED: "info", ESCALATED: "danger",
   REJECTED: "danger", CANCELLED: "neutral", FAILED: "danger", SUSPENDED: "danger", REFUNDED: "neutral", PARTIALLY_REFUNDED: "neutral", DRAFT: "neutral", ARCHIVED: "neutral", ABANDONED: "neutral", INITIATED: "neutral",
 };
 
