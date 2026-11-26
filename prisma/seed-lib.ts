@@ -1,3 +1,4 @@
+import { loadLegalDocs } from "./publish-legal";
 /**
  * Seed: platform configuration (always) + an optional, clearly-labelled demo catalogue.
  *
@@ -113,7 +114,10 @@ async function platform() {
     ["vendor-agreement", "Vendor Agreement", "## Commission\n\nXavierConnect charges a commission on each completed sale according to your plan and the category commission table.\n\n## Settlement\n\nEarnings become available for withdrawal after delivery and a hold period: shorter when delivery is independently evidenced (carrier scan, rider proof of delivery, buyer confirmation, digital delivery or service completion) and longer when the only evidence is the seller's own update. An open dispute pauses settlement for that order.\n\n## Payouts\n\nWithdrawals are paid through licensed payment partners to a verified bank account in the seller's country of registration. International payouts are converted at the partner's quoted rate and are only offered where an approved partner and the required compliance approvals are in place. A payout is complete only when the partner (or, for manual transfers, our bank) confirms it. XavierConnect will never ask for online-banking passwords, PINs or one-time codes.\n\n## Prohibited items\n\nSellers may not list counterfeit goods, weapons, controlled substances, or any item prohibited by Nigerian law.\n\n*Template — requires legal review before launch.*"],
     ["cookies", "Cookie Policy", "We use strictly necessary cookies to keep you signed in and remember your cart. We do not use advertising cookies.\n\n*Template — requires legal review before launch.*"],
   ];
-  for (const [s, title, body] of pages) await db.cmsPage.upsert({ where: { slug: s }, update: {}, create: { slug: s, title, body } });
+  // Full legal texts live in docs/legal/*.md (published to existing databases with prisma/publish-legal.ts).
+  const legal = new Map(loadLegalDocs().map((d) => [d.slug, d]));
+  for (const [s, title, body] of pages) { const d = legal.get(s); await db.cmsPage.upsert({ where: { slug: s }, update: {}, create: d ? { slug: s, title: d.title, body: d.body, seoDescription: d.seoDescription } : { slug: s, title, body } }); }
+  for (const d of legal.values()) if (!pages.some(([s]) => s === d.slug)) await db.cmsPage.upsert({ where: { slug: d.slug }, update: {}, create: d });
 
   if ((await db.faq.count()) === 0) {
     const faqs: [string, string, string][] = [

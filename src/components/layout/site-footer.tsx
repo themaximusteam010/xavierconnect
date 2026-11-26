@@ -5,8 +5,8 @@ import { NewsletterForm } from "./newsletter-form";
 const COLS = [
   { title: "Shop", links: [["All products", "/shop"], ["Services", "/services"], ["Digital products", "/shop?type=digital"], ["Deals", "/deals"], ["Stores", "/stores"], ["Compare", "/compare"]] },
   { title: "Sell", links: [["Become a vendor", "/sell"], ["Vendor dashboard", "/vendor"], ["Vendor agreement", "/legal/vendor-agreement"], ["Seller help", "/help#selling"]] },
-  { title: "Support", links: [["Help Centre", "/help"], ["FAQ", "/faq"], ["Contact us", "/contact"], ["Shipping policy", "/legal/shipping"], ["Returns & refunds", "/legal/returns"]] },
-  { title: "Company", links: [["About XavierConnect", "/about"], ["Blog", "/blog"], ["Terms", "/legal/terms"], ["Privacy", "/legal/privacy"], ["Cookies", "/legal/cookies"]] },
+  { title: "Support", links: [["Help Centre", "/help"], ["FAQ", "/faq"], ["Contact us", "/contact"], ["Shipping policy", "/legal/shipping"], ["Returns", "/legal/returns"], ["Refunds", "/legal/refunds"], ["Prohibited items", "/legal/prohibited-items"]] },
+  { title: "Company", links: [["About XavierConnect", "/about"], ["Blog", "/blog"], ["Terms", "/legal/terms"], ["Privacy", "/legal/privacy"], ["Cookies", "/legal/cookies"], ["Acceptable use", "/legal/acceptable-use"], ["Intellectual property", "/legal/ip-policy"]] },
 ];
 
 export function SiteFooter() {
