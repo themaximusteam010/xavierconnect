@@ -2,23 +2,25 @@
  * Paystack integration (https://paystack.com/docs/api/).
  * Status: implemented against the documented API; NOT yet exercised against a live or test
  * Paystack account from this codebase. Signature verification is unit-tested.
- * Enable with PAYMENT_PROVIDER=paystack and PAYSTACK_SECRET_KEY.
+ * Enable with PAYMENT_PROVIDER=paystack. The secret key is the one saved (encrypted) in
+ * Admin → Integrations → Paystack, with PAYSTACK_SECRET_KEY as a fallback.
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { PaymentProvider, VerifyResult } from "./types";
+import { providerContext } from "@/server/integrations/registry";
 
 const BASE = "https://api.paystack.co";
 
-function key() {
-  const k = process.env.PAYSTACK_SECRET_KEY;
-  if (!k) throw new Error("PAYSTACK_SECRET_KEY is not configured");
+async function key() {
+  const k = (await providerContext("paystack")).credentials.secretKey;
+  if (!k) throw new Error("Paystack secret key is not configured (Admin → Integrations → Paystack)");
   return k;
 }
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: { Authorization: `Bearer ${key()}`, "Content-Type": "application/json", ...(init?.headers ?? {}) },
+    headers: { Authorization: `Bearer ${await key()}`, "Content-Type": "application/json", ...(init?.headers ?? {}) },
     cache: "no-store",
   });
   const body = (await res.json()) as { status: boolean; message: string; data: T };
@@ -27,7 +29,7 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function verifyPaystackSignature(rawBody: string, signature: string | null, secret: string): boolean {
-  if (!signature) return false;
+  if (!signature || !secret) return false;
   const expected = createHmac("sha512", secret).update(rawBody).digest("hex");
   const a = Buffer.from(signature, "hex");
   const b = Buffer.from(expected, "hex");
@@ -56,8 +58,9 @@ export const paystackProvider: PaymentProvider = {
       raw: d,
     };
   },
+  // Live webhooks are verified in services/webhooks.ts with the admin-saved key; this path only supports the env key.
   parseWebhook(rawBody, headers) {
-    if (!verifyPaystackSignature(rawBody, headers.get("x-paystack-signature"), key())) return null;
+    if (!verifyPaystackSignature(rawBody, headers.get("x-paystack-signature"), process.env.PAYSTACK_SECRET_KEY ?? "")) return null;
     const evt = JSON.parse(rawBody) as { event: string; data: { id?: number; reference?: string } };
     return {
       eventKey: `${evt.event}:${evt.data.id ?? evt.data.reference}`,
