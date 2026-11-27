@@ -13,6 +13,24 @@ export const chamsswitchKardit: PayoutAdapter = {
   credentialFields: [],
 };
 
+/**
+ * Fincra China payouts (CNY to mainland bank accounts over CNAPS). The flow is documented
+ * (docs/providers/fincra-china-payouts.md) but key details are not: the required processing-mode field on POST /send,
+ * NGN→CNY quoting (the quote endpoint does not list CNY/cnaps), and amount units. Per project rules the adapter stays
+ * capability-less until Fincra answers those questions in writing and sandbox credentials are available.
+ */
+export const fincraChina: PayoutAdapter = {
+  key: "fincra",
+  name: "Fincra — China payouts",
+  kind: "PAYMENT",
+  capabilities: [],
+  status: "AWAITING_PARTNERSHIP",
+  docsUrl: "https://docs.fincra.com/docs/china-payouts",
+  notes:
+    "Pays CNY into business or personal bank accounts in mainland China over CNAPS; a 'merchant_settlement' purpose with a merchant agreement covers marketplace seller payouts. Senders are verified (hours) and each Chinese seller is registered once (up to 48 h). Before enabling: Fincra must enable CNY for this merchant and confirm NGN→CNY funding, the processing-mode field on POST /send, amount units, fees, and payout webhook events (see docs/providers/fincra-china-payouts.md §12). Production also needs server IP allow-listing.",
+  credentialFields: [],
+};
+
 export const flutterwave: PayoutAdapter = {
   key: "flutterwave",
   name: "Flutterwave",

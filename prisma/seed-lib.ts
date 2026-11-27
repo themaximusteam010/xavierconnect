@@ -279,6 +279,7 @@ export async function seedIntegrations(client: PrismaClient) {
   const providers = [
     { key: "paystack", kind: "PAYMENT", name: "Paystack", active: false, approval: "NOT_STARTED", countries: ["NG"], currencies: ["NGN"], methods: ["card", "bank_transfer", "ussd"] },
     { key: "flutterwave", kind: "PAYMENT", name: "Flutterwave", active: false, approval: "NOT_STARTED", countries: [], currencies: [], methods: [] },
+    { key: "fincra", kind: "PAYMENT", name: "Fincra — China payouts", active: false, approval: "NOT_STARTED", countries: ["CN"], currencies: ["CNY"], methods: ["bank_transfer"], notes: "CNY payouts to Chinese bank accounts (CNAPS). Awaiting Fincra account, CNY enablement and answers to the undocumented API questions in docs/providers/fincra-china-payouts.md." },
     { key: "chamsswitch-kardit", kind: "PAYMENT", name: "ChamsSwitch — Kardit", active: false, approval: "NOT_STARTED", countries: ["CN"], currencies: ["CNY"], methods: ["bank_transfer"], notes: "Partnership review required for marketplace (third-party seller) settlement." },
     { key: "manual", kind: "PAYMENT", name: "Manual bank transfer", active: true, approval: "NOT_REQUIRED", countries: ["NG"], currencies: ["NGN"], methods: ["bank_transfer"] },
     { key: "sandbox-payouts", kind: "PAYMENT", name: "Sandbox domestic payouts", active: true, approval: "NOT_REQUIRED", countries: ["NG"], currencies: ["NGN"], methods: ["bank_transfer"] },
@@ -301,6 +302,7 @@ export async function seedIntegrations(client: PrismaClient) {
     { country: "NG", currency: "NGN", providerKey: "sandbox-payouts", method: "LOCAL", status: "SANDBOX", complianceNote: "Test mode only." },
     { country: "NG", currency: "NGN", providerKey: "paystack", method: "LOCAL", status: "DISABLED", complianceNote: "Enable after Paystack transfers are approved on the live account." },
     { country: "CN", currency: "CNY", providerKey: "sandbox-crossborder", method: "CROSS_BORDER", status: "SANDBOX", complianceNote: "Test mode only — no real CNY settlement." },
+    { country: "CN", currency: "CNY", providerKey: "fincra", method: "CROSS_BORDER", status: "DISABLED", complianceNote: "Awaiting Fincra merchant onboarding, CNY enablement, CBN licence confirmation and written answers on NGN→CNY funding." },
     { country: "CN", currency: "CNY", providerKey: "chamsswitch-kardit", method: "CROSS_BORDER", status: "DISABLED", complianceNote: "Awaiting ChamsSwitch partnership review for marketplace seller settlement, API access and CBN/PBoC compliance confirmation." },
   ];
   for (const c of corridors) {

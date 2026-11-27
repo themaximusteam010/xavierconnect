@@ -2,7 +2,7 @@ import { db } from "@/server/db";
 import { decryptJson } from "@/server/crypto";
 import { paystackTransfers } from "./payments/paystack-transfers";
 import { sandboxCrossBorder, sandboxDomesticPayouts } from "./payments/sandbox";
-import { chamsswitchKardit, flutterwave, manualPayouts } from "./payments/pending";
+import { chamsswitchKardit, fincraChina, flutterwave, manualPayouts } from "./payments/pending";
 import { shipbubble } from "./shipping/shipbubble";
 import { sandboxShipping } from "./shipping/sandbox";
 import { aquantuo, colala, nipost, runDelivery, skyways } from "./shipping/pending";
@@ -11,7 +11,7 @@ import { fedex } from "./shipping/fedex";
 import { gigLogistics } from "./shipping/gig";
 import { ProviderUnavailableError, type PaymentCapability, type PayoutAdapter, type ProviderContext, type ShippingAdapter, type ShippingCapability } from "./types";
 
-export const PAYMENT_ADAPTERS: PayoutAdapter[] = [paystackTransfers, flutterwave, chamsswitchKardit, manualPayouts, sandboxDomesticPayouts, sandboxCrossBorder];
+export const PAYMENT_ADAPTERS: PayoutAdapter[] = [paystackTransfers, fincraChina, flutterwave, chamsswitchKardit, manualPayouts, sandboxDomesticPayouts, sandboxCrossBorder];
 export const SHIPPING_ADAPTERS: ShippingAdapter[] = [shipbubble, gigLogistics, runDelivery, dhlExpress, fedex, skyways, aquantuo, colala, nipost, sandboxShipping];
 
 export const paymentAdapter = (key: string) => PAYMENT_ADAPTERS.find((a) => a.key === key);
